@@ -1,0 +1,7 @@
+-Talked about project requirements and features
+-Created Trello board
+-Completed Use Case Diagram
+-Wireframed basic pages
+-Discussed api calls
+	-Choosing between world clock api and stock display api
+
