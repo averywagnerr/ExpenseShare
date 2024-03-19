@@ -41,9 +41,9 @@ ExpenseShare is an expense organizer that allows you and a group of other people
 
 |         Name         |               Email               | Github Username |
 | :------------------: | :-------------------------------: | :-------------: |
-|      Mason Bott      |                                   |
-|    Tyler Haskins     |                                   |
-|    Connor Julson     |                                   |
+|      Mason Bott      | mason.bott@colorado.edu           |
+|    Tyler Haskins     | tyha8015@colorado.edu             |
+|    Connor Julson     | connor.julson@colorado.edu        |
 | Mariana Vadas-Arendt | mariana.vadas-arendt@colorado.edu |  marianavadas   |
 |     Avery Wagner     |     avery.wagner@colorado.edu     |  averywagnerr   |
 
