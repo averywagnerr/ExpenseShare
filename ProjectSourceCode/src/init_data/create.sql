@@ -1,14 +1,30 @@
---TODO: Table for users
-
 CREATE TABLE IF NOT EXISTS users (
-    username VARCHAR(50) PRIMARY KEY,
-    password CHAR(60) NOT NULL
+		id SERIAL PRIMARY KEY,
+		username VARCHAR(255) NOT NULL,
+		password VARCHAR(255) NOT NULL,
 );
 
---TODO: Users to groups maybe
+CREATE TABLE IF NOT EXISTS groups (
+		id SERIAL PRIMARY KEY,
+		name VARCHAR(255) NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
---TODO: Table for groups
+CREATE TABLE IF NOT EXISTS user_to_groups (
+	foreign_key user_id REFERENCES users(id),
+	foreign_key group_id REFERENCES groups(id)
+);
 
---TODO: Users to transactions maybe
+CREATE TABLE IF NOT EXISTS user_to_transactions (
+	foreign_key user_id REFERENCES users(id),
+	foreign_key transaction_id REFERENCES transactions(id)
+);
 
---TODO: Table for transactions/payments
+CREATE TABLE IF NOT EXISTS transactions (
+		id SERIAL PRIMARY KEY,
+		amount DECIMAL(10, 2) NOT NULL,
+		description TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+--TODO: Potentially add views to simplify queries
