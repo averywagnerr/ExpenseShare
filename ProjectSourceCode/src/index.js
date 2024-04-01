@@ -55,7 +55,7 @@ db.connect()
 	});
 
 // Database test route
-app.get('/db', (req, res) => {
+app.get('/db', (_, res) => {
 	query = 'SELECT * FROM users'
 	db.tx(async t => {
 		const users = await t.manyOrNone('SELECT * FROM users');
