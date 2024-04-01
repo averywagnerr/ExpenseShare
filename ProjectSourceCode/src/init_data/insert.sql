@@ -1,1 +1,4 @@
---TODO: Insert sample stuff into tables when made
+
+INSERT INTO users (username, password) VALUES ('admin', 'admin');
+
+SELECT * FROM users;
