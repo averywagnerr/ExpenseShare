@@ -57,13 +57,23 @@ db.connect()
 // Database test route
 app.get('/db', (req, res) => {
 	query = 'SELECT * FROM users'
-	db.one(query).then(data => {
-		console.log(data);
-		res.send(data);
-	}).catch(error => {
-		// res.send(error);
-		console.log('ERROR:', error);
-	});
+	db.tx(async t => {
+		const users = await t.manyOrNone('SELECT * FROM users');
+		const groups = await t.manyOrNone('SELECT * FROM groups');
+
+		return { users, groups };
+	})
+		.then(data => {
+			queries = {
+				users: data.users,
+				groups: data.groups,
+			};
+
+			res.send(queries);
+		})
+		.catch(error => {
+			console.log('ERROR:', error);
+		});
 });
 
 // Start server listening
