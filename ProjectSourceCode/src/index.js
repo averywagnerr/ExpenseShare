@@ -180,36 +180,6 @@ const auth = (req, res, next) => {
   // Authentication Required
   app.use(auth);
 
-  app.get('/discover', (req, res) => {
-    axios({
-      url: `https://app.ticketmaster.com/discovery/v2/events.json`,
-      method: 'GET',
-      dataType: 'json',
-      headers: {
-        'Accept-Encoding': 'application/json',
-      },
-      params: {
-        apikey: process.env.API_KEY,
-        keyword: 'Drake', //you can choose any artist/event here
-        size: 10 // you can choose the number of events you would like to return
-      },
-    })
-      .then(results => {
-        console.log(results.data._embedded.events); // the results will be displayed on the terminal if the docker containers are running // Send some parameters
-        res.render('pages/discover', {
-          results: results.data._embedded.events
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        // Handle errors
-        res.render('pages/discover', {
-          results: [],
-          message: "No events found"
-        });
-      });
-  });
-
   app.get('/logout', (req, res) => {
     req.session.destroy();
     res.render('pages/logout'); 
