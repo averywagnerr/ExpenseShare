@@ -75,6 +75,27 @@ app.use(
 // *****************************************************
 
 // TODO - Include your API routes here
+app.get('/db', (_, res) => {
+	query = 'SELECT * FROM users'
+	db.tx(async t => {
+		const users = await t.manyOrNone('SELECT * FROM users');
+		const groups = await t.manyOrNone('SELECT * FROM groups');
+
+		return { users, groups };
+	})
+		.then(data => {
+			queries = {
+				users: data.users,
+				groups: data.groups,
+			};
+
+			res.send(queries);
+		})
+		.catch(error => {
+			console.log('ERROR:', error);
+		});
+});
+
 
 app.get('/', (req, res) => {
     res.redirect('/login'); //this will call the /anotherRoute route in the API
