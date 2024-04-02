@@ -1,0 +1,5 @@
+-adding index js file to outline routes
+-making sure docker file works
+-filling out html pages and building out UI
+
+-keep expanding on tasks based on sotry board
