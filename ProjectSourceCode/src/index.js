@@ -56,13 +56,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
 // initialize session variables
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-  })
-);
+// === Use to connect to external APIs (i.e. PayPal) ===
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     saveUninitialized: false,
+//     resave: false,
+//   })
+// );
 
 app.use(
   bodyParser.urlencoded({
@@ -75,6 +76,27 @@ app.use(
 // *****************************************************
 
 // TODO - Include your API routes here
+app.get('/db', (_, res) => {
+	query = 'SELECT * FROM users'
+	db.tx(async t => {
+		const users = await t.manyOrNone('SELECT * FROM users');
+		const groups = await t.manyOrNone('SELECT * FROM groups');
+
+		return { users, groups };
+	})
+		.then(data => {
+			queries = {
+				users: data.users,
+				groups: data.groups,
+			};
+
+			res.send(queries);
+		})
+		.catch(error => {
+			console.log('ERROR:', error);
+		});
+});
+
 
 app.get('/', (req, res) => {
     res.redirect('/login'); //this will call the /anotherRoute route in the API
@@ -158,36 +180,6 @@ const auth = (req, res, next) => {
   
   // Authentication Required
   app.use(auth);
-
-  app.get('/discover', (req, res) => {
-    axios({
-      url: `https://app.ticketmaster.com/discovery/v2/events.json`,
-      method: 'GET',
-      dataType: 'json',
-      headers: {
-        'Accept-Encoding': 'application/json',
-      },
-      params: {
-        apikey: process.env.API_KEY,
-        keyword: 'Drake', //you can choose any artist/event here
-        size: 10 // you can choose the number of events you would like to return
-      },
-    })
-      .then(results => {
-        console.log(results.data._embedded.events); // the results will be displayed on the terminal if the docker containers are running // Send some parameters
-        res.render('pages/discover', {
-          results: results.data._embedded.events
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        // Handle errors
-        res.render('pages/discover', {
-          results: [],
-          message: "No events found"
-        });
-      });
-  });
 
   app.get('/logout', (req, res) => {
     req.session.destroy();
