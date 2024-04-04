@@ -13,7 +13,7 @@ describe('Testing Add User API', () => {
       chai
         .request(server)
         .post('/register')
-        .send({username: 'testuser', password: 12345678})
+        .send({username: 'testuser', password: 'GoodPassword123!'})
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body.message).to.equals('Success');
@@ -35,7 +35,7 @@ describe('Testing Add User API', () => {
       chai
         .request(server)
         .post('/register')
-        .send({username: 'testuser2', password: 0}) // require 8+ characters in password
+        .send({username: 'testuser2', password: 123}) // require 8+ characters, uppercase letter, lowercase letter, and special char in password
         .end((err, res) => {
           expect(res).to.have.status(400);
           expect(res.body.message).to.equals('Invalid input');
