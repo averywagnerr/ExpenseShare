@@ -116,24 +116,35 @@ app.get('/register', (req, res) => {
 
 // Register
 app.post('/register', async (req, res) => {
-	//hash the password using bcrypt library
-	const hash = await bcrypt.hash(req.body.password, 10);
-
-	// To-DO: Insert username and hashed password into the 'users' table
-	db.tx(async t => {
-		return t.any(
-			'INSERT INTO users (username, password) VALUES ($1, $2);',
-			[req.body.username, hash]
+	db.tx(async (t) => {
+		const user = await t.oneOrNone(
+		  `SELECT * FROM users WHERE users.username = $1`,
+		  req.body.username
 		);
-	})
-		.then(users => {
-			res.redirect('pages/login');
-		})
-		.catch(err => {
-			res.render('pages/register', {
-				message: "Username is already in use, please enter another username."
-			});
-		});
+	
+		if (user) {
+		  throw new Error(`User ${req.body.username} already exists!`);
+		}
+	  }).catch((e) => {
+		console.log(e);
+		res.redirect("/login?error=" + encodeURIComponent(e.message));
+	  });
+	  // hash the password using bcrypt library
+	  const hash = await bcrypt.hash(req.body.password, 10);
+	  try {
+		await db.none("INSERT INTO users(username, password) VALUES ($1, $2);", [
+		  req.body.username,
+		  hash,
+		]);
+	
+		res.redirect(
+		  "/login?message=" + encodeURIComponent("Successfully registered!")
+		);
+	  } catch (e) {
+		console.log(e);
+		// res.redirect("/register");
+		res.redirect("/register?error=" + encodeURIComponent(e.message));
+	  }
 });
 
 app.get('/login', (req, res) => {
