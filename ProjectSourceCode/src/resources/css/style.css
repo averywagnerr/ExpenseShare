@@ -1,3 +1,9 @@
+.bigtext {
+    padding: 30px;
+    font-size: 40px;
+    text-decoration: underline;
+  }
+
 .textblock {
     display: inline-grid;
     padding: 30px;
@@ -32,9 +38,3 @@
     width: 65px;
 
   }
-
-.bigtext {
-  padding: 30px;
-  font-size: 40px;
-  text-decoration: underline;
-}
