@@ -1,14 +1,34 @@
+{{!-- <style>
+    .grid {
+        display:grid;
+        row-gap: 20px;
+        column-gap: 20px;
+    }
+    form{
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
+</style> --}}
+
+<style>
+
+</style>
+
 <h1>Login to your account:</h1>
 
+<div class="grid">
 <form method="post" action="/login">
     <label for="username">Username:</label>
     <input type="text" name="username"/><br />
+    {{!-- <p>&nbsp;</p> --}}
     <label for="password">Password:</label>
     <input type="text" name="password"/><br />
-
+    {{!-- <p>&nbsp;</p> --}}
     <button id="submit_button" type="submit">
         Login
     </button>
 </form>
 
-<p>Don't have an account? Register Here: <a href="/ExpenseShare/ProjectSourceCode/src/views/pages/register.hbs"></a></p>
+<p>Don't have an account? Register Here: <a href="/ExpenseShare/ProjectSourceCode/src/views/pages/register.hbs">Register</a></p>
+
+</div>
