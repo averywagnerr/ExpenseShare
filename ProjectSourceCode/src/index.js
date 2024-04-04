@@ -216,6 +216,7 @@ app.get('/home', (req, res) => {
 	if (req.session.user) {
 		res.render('pages/home', {
 			user: req.session.user,
+			username: req.session.user.username
 		});
 	} else {
 		res.redirect('/login', { message: "Please login to access this page." });
