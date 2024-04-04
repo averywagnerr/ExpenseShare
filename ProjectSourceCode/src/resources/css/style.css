@@ -2,7 +2,7 @@
     padding: 30px;
     font-size: 40px;
     text-decoration: underline;
-  }
+}
 
 .textblock {
     display: inline-grid;
@@ -36,5 +36,4 @@
     top: 0px;
     right: 100px;
     width: 65px;
-
-  }
+}

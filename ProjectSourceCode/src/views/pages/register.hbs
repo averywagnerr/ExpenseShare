@@ -1,7 +1,16 @@
+ <head>
+    <div class = "textblock" id="image-text-relation">
+        {{!-- <img src="../resources/img/logo.jpg" alt="logo" style="width: 400px;" onerror="this.src='images/not_found.png';"> --}}
+        <div class = "bigtext">
+            <a class="Welcome mx-2">WELCOME TO EXPENSESHARE</a>
+        </div>
+        <div id = "Expense-share-desc" class = 'text'>ExpenseShare is an effortless and innovative way to keep track of a group's expenses. It allows for easy payment calculations, withdraws and deposits, as well as an overview of a group's payment history. </p></div>
+    </div>
+</head>
+
 <h1>Register a new account:</h1>
 
-<form method="post" action="/register"></form>
-
+<form method="post" action="/register">
     <label for="username">Username:</label>
     <input type="text" name="username"/><br />
     <label for="password">Password:</label>
@@ -12,4 +21,4 @@
     </button>
 </form>
 
-<p>Already have an account? Login Here: <a href="/ExpenseShare/ProjectSourceCode/src/views/pages/login.hbs"></a></p>
+<p>Already have an account? Login Here: <a href="./login">Login</a></p>
