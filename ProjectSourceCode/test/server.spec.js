@@ -9,11 +9,11 @@
 */
 
 describe('Testing Add User API', () => {
-    it('positive : /add_user', done => {
+    it('positive : /register', done => {
       chai
         .request(server)
-        .post('/add_user')
-        .send({id: 5, name: 'John Doe', dob: '2020-02-20'})
+        .post('/register')
+        .send({username: 'testuser', password: 12345678})
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body.message).to.equals('Success');
@@ -31,11 +31,11 @@ describe('Testing Add User API', () => {
     * Result: This test case should pass and return a status 400 along with a "Invalid input" message.
     * Explanation: The testcase will call the /add_user API with the following invalid inputs and expects the API to return a status of 400 along with the "Invalid input" message.
     */
-    it('Negative : /add_user. Checking invalid name', done => {
+    it('Negative : /register. Checking invalid name', done => {
       chai
         .request(server)
-        .post('/add_user')
-        .send({id: '5', name: 10, dob: '2020-02-20'})
+        .post('/register')
+        .send({username: 'testuser2', password: 0}) // require 8+ characters in password
         .end((err, res) => {
           expect(res).to.have.status(400);
           expect(res.body.message).to.equals('Invalid input');
@@ -43,3 +43,8 @@ describe('Testing Add User API', () => {
         });
     });
   });
+
+
+  /* Test Case 3
+  * Message Functionality
+  */
