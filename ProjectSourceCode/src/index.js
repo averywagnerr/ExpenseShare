@@ -106,11 +106,15 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-	res.render('pages/login');
+let errorMessage = req.query.error;
+let message = req.query.message;
+res.render("pages/login", { message: errorMessage || message });
 });
 
 app.get('/register', (req, res) => {
-	res.render('pages/register');
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+  res.render("pages/register", { message: errorMessage || message });
 });
 
 
@@ -147,36 +151,53 @@ app.post('/register', async (req, res) => {
 	  }
 });
 
-app.get('/login', (req, res) => {
-	res.render('pages/login');
-});
-
-
 app.post('/login', async (req, res) => {
 
-	const [user] = await db.tx(async t => {
-		return t.any(
-			`SELECT * FROM users WHERE username = '${req.body.username}'`,
+	db.tx(async (t) => {
+		// check if password from request matches with password in DB
+		const user = await t.oneOrNone(
+		  `SELECT * FROM users WHERE users.username = $1`,
+		  req.body.username
 		);
-	})
-
-	if (user?.username) {
+	
+		if (!user) {
+		  throw new Error(`User ${req.body.username} not found in database.`);
+		}
+	
 		const match = await bcrypt.compare(req.body.password, user.password);
+		if (!match) {
+		  throw new Error(`The password entered is incorrect.`);
+		}
+		req.session.user = user;
+		req.session.save();
+		res.redirect("/discover");
+	  }).catch((err) => {
+		console.log(err);
+		res.redirect("/login?error=" + encodeURIComponent(err.message));
+	  });
+	// const [user] = await db.tx(async t => {
+	// 	return t.any(
+	// 		`SELECT * FROM users WHERE username = '${req.body.username}'`,
+	// 	);
+	// })
 
-		if (match) {
-			req.session.user = user;
-			req.session.save();
-			res.redirect('/home');
-		}
-		else {
-			res.render('pages/login', {
-				message: "Incorrect username or password.",
-			});
-		}
-	}
-	else {
-		res.redirect('/register');
-	}
+	// if (user?.username) {
+	// 	const match = await bcrypt.compare(req.body.password, user.password);
+
+	// 	if (match) {
+	// 		req.session.user = user;
+	// 		req.session.save();
+	// 		res.redirect('/home');
+	// 	}
+	// 	else {
+	// 		res.render('pages/login', {
+	// 			message: "Incorrect username or password.",
+	// 		});
+	// 	}
+	// }
+	// else {
+	// 	res.redirect('/register');
+	// }
 });
 
 // Authentication Middleware.
