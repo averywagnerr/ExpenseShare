@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
-		username VARCHAR(255) PRIMARY KEY,
-		password VARCHAR(255) NOT NULL
+		username VARCHAR(50) PRIMARY KEY,
+		password VARCHAR(60) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS groups (
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 CREATE TABLE IF NOT EXISTS user_to_groups (
-	username VARCHAR(255) REFERENCES users,
+	username VARCHAR(50) REFERENCES users,
 	groupname VARCHAR(255) REFERENCES groups,
 	PRIMARY KEY (username, groupname)
 );

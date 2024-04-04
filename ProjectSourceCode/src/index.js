@@ -19,31 +19,31 @@ const axios = require('axios'); // To make HTTP requests from our server. We'll 
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
-  extname: 'hbs',
-  layoutsDir: __dirname + '/views/layouts',
-  partialsDir: __dirname + '/views/partials',
+	extname: 'hbs',
+	layoutsDir: __dirname + '/views/layouts',
+	partialsDir: __dirname + '/views/partials',
 });
 
 // database configuration
 const dbConfig = {
-  host: 'db', // the database server
-  port: 5432, // the database port
-  database: process.env.POSTGRES_DB, // the database name
-  user: process.env.POSTGRES_USER, // the user account to connect with
-  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+	host: 'db', // the database server
+	port: 5432, // the database port
+	database: process.env.POSTGRES_DB, // the database name
+	user: process.env.POSTGRES_USER, // the user account to connect with
+	password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
 const db = pgp(dbConfig);
 
 // test your database
 db.connect()
-  .then(obj => {
-    console.log('Database connection successful'); // you can view this message in the docker compose logs
-    obj.done(); // success, release the connection;
-  })
-  .catch(error => {
-    console.log('ERROR:', error.message || error);
-  });
+	.then(obj => {
+		console.log('Database connection successful'); // you can view this message in the docker compose logs
+		obj.done(); // success, release the connection;
+	})
+	.catch(error => {
+		console.log('ERROR:', error.message || error);
+	});
 
 // *****************************************************
 // <!-- Section 3 : App Settings -->
@@ -57,18 +57,18 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     saveUninitialized: false,
-//     resave: false,
-//   })
-// );
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET,
+		saveUninitialized: false,
+		resave: false,
+	})
+);
 
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
+	bodyParser.urlencoded({
+		extended: true,
+	})
 );
 
 // *****************************************************
@@ -97,98 +97,107 @@ app.get('/db', (_, res) => {
 		});
 });
 
+app.get('/welcome', (req, res) => {
+	res.json({ status: 'success', message: 'Welcome!' });
+});
 
 app.get('/', (req, res) => {
-    res.redirect('/login'); //this will call the /anotherRoute route in the API
+	res.redirect('/login'); //this will call the /anotherRoute route in the API
 });
 
 app.get('/login', (req, res) => {
-    res.render('pages/login');
+	res.render('pages/login');
 });
 
 app.get('/register', (req, res) => {
-    res.render('pages/register');
+	res.render('pages/register');
 });
 
 
 // Register
 app.post('/register', async (req, res) => {
-    //hash the password using bcrypt library
-    const hash = await bcrypt.hash(req.body.password, 10);
-  
-    // To-DO: Insert username and hashed password into the 'users' table
-    db.tx(async t => {
-        return t.any(
-            'INSERT INTO users (username, password) VALUES ($1, $2);',
-            [req.body.username, hash]
-        );
-    })
-    .then(users => {
-      res.render('pages/login');
-    })
-    .catch(err => {
-      res.render('pages/register', {
-        message: "Username is already in use, please enter another username."
-      });
-    });
-  });
+	//hash the password using bcrypt library
+	const hash = await bcrypt.hash(req.body.password, 10);
+
+	// To-DO: Insert username and hashed password into the 'users' table
+	db.tx(async t => {
+		return t.any(
+			'INSERT INTO users (username, password) VALUES ($1, $2);',
+			[req.body.username, hash]
+		);
+	})
+		.then(users => {
+			res.render('pages/login');
+		})
+		.catch(err => {
+			res.render('pages/register', {
+				message: "Username is already in use, please enter another username."
+			});
+		});
+});
 
 app.get('/login', (req, res) => {
-    res.render('pages/login'); 
+	res.render('pages/login');
 });
 
 
 app.post('/login', async (req, res) => {
 
-  const [user] = await db.tx(async t => {
-    return t.any(
-      `SELECT * FROM users WHERE username = '${req.body.username}'`,
-    );
-  })
+	const [user] = await db.tx(async t => {
+		return t.any(
+			`SELECT * FROM users WHERE username = '${req.body.username}'`,
+		);
+	})
 
-  if (user?.username)
-  {
-    const match = await bcrypt.compare(req.body.password, user.password);
+	if (user?.username) {
+		const match = await bcrypt.compare(req.body.password, user.password);
 
-    if (match)
-    {
-      req.session.user = user;
-      req.session.save();
-      res.redirect('/discover');
-    }
-    else
-    {
-      res.render('pages/login', {
-        message: "Incorrect username or password.",
-      });
-    }
-  }
-  else
-  {
-    res.redirect('/register');
-  }
+		if (match) {
+			req.session.user = user;
+			req.session.save();
+			res.redirect('/home');
+		}
+		else {
+			res.render('pages/login', {
+				message: "Incorrect username or password.",
+			});
+		}
+	}
+	else {
+		res.redirect('/register');
+	}
 });
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
-    if (!req.session.user) {
-      // Default to login page.
-      return res.redirect('/login');
-    }
-    next();
-  };
-  
-  // Authentication Required
-  app.use(auth);
+	if (!req.session.user) {
+		// Default to login page.
+		return res.redirect('/login');
+	}
+	next();
+};
 
-  app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.render('pages/logout'); 
-  });
+// Authentication Required
+app.use(auth);
+
+app.get('/home', (req, res) => {
+	if (req.session.user) {
+		res.render('pages/home', {
+			user: req.session.user,
+		});
+	} else {
+		res.redirect('/login', { message: "Please login to access this page." });
+	}
+});
+
+app.get('/logout', (req, res) => {
+	req.session.destroy();
+	res.render('pages/logout');
+});
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
