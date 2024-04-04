@@ -170,7 +170,7 @@ app.post('/login', async (req, res) => {
 		}
 		req.session.user = user;
 		req.session.save();
-		res.redirect("/discover");
+		res.redirect("/home");
 	  }).catch((err) => {
 		console.log(err);
 		res.redirect("/login?error=" + encodeURIComponent(err.message));
