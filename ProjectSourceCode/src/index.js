@@ -127,7 +127,7 @@ app.post('/register', async (req, res) => {
 		);
 	})
 		.then(users => {
-			res.render('pages/login');
+			res.redirect('pages/login');
 		})
 		.catch(err => {
 			res.render('pages/register', {
