@@ -1,0 +1,111 @@
+<header>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+        crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="stylesheet.css">
+
+    <div name="grid">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <link rel="stylesheet" href="..\resources\css\style-sheet.css">
+    </div>
+
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <a class="navbar-brand"></a>
+          <a class="nav-item">
+              <a class="bigtext black-text">ExpenseShare</a>
+      </div>
+  
+      <div class="navbar-collapse collapse order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <a class="nav-item">
+                <a class="nav-link black-text">
+                  hi,user!
+                </a>
+            </a>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+<form <!--method="post" action="/login"-->>
+    <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
+    <label class = "box" {{balance}}></label>
+    <!--<input type="text" name="username"/><br/>-->
+        <!--{{balance}}-->
+    <br>
+    <label class="slightlysmallerbigtext black-text" for="members">Members:</label>
+        <label class = "box" {{members}}></label>
+    <!--<input type="text" name="password"/><br/>-->
+</form>
+
+<div class = "box">
+    <form>
+        <label class="black-text box-titles">In/Out Cash</label>
+        <br>
+        <label class="black-text" for="deposit-amount">Deposit:</label>
+        <input type="text" name="deposit-amount"/><br/>
+        <label class="black-text" type="withdraw-amount">Withdraw:</label>
+        <input type="text" name="withdraw-amount"/><br/>
+    </form>
+<button id="send_button" type="submit" class="black-text">
+    Send
+</button>
+</div>
+
+
+<div class = "box">
+    <form>
+        <label class="black-text box-titles">Group Pay</label>
+        <br>
+        <label class="black-text" for="expense-amount">Expense:</label>
+        <input type="text" name="expense-amount"/><br/>
+        <label class="black-text" type="percent-to-pay">Share:</label>
+        <input type="text" name="share-amount"/><br/>
+    </form>
+
+    <button id="calculate_button" type="submit" class="black-text">
+        Calculate
+    </button>
+</div>
+<br>
+
+<div Resume id="resume" class = "box">
+
+    <label class="black-text box-titles"> Payment History </label>
+    <table class ="centered">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Deposit Amount</th>
+            <th>Withdraw Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Userl</td>
+            <td>+$100</td>
+            <td>-$100</td>
+          </tr>
+          <tr>
+            <td>User2</td>
+            <td>+$200</td>
+            <td>-$200</td>
+          </tr>
+          <tr></tr>
+        </tbody>
+</thead>
+</table>
+</body>
+</div>
+
