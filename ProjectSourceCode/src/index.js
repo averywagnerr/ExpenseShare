@@ -57,13 +57,13 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     saveUninitialized: false,
-//     resave: false,
-//   })
-// );
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET,
+		saveUninitialized: false,
+		resave: false,
+	})
+);
 
 app.use(
 	bodyParser.urlencoded({
@@ -127,7 +127,7 @@ app.post('/register', async (req, res) => {
 		);
 	})
 		.then(users => {
-			res.render('pages/login');
+			res.redirect('pages/login');
 		})
 		.catch(err => {
 			res.render('pages/register', {
@@ -155,7 +155,7 @@ app.post('/login', async (req, res) => {
 		if (match) {
 			req.session.user = user;
 			req.session.save();
-			res.redirect('/discover');
+			res.redirect('/home');
 		}
 		else {
 			res.render('pages/login', {
@@ -179,6 +179,16 @@ const auth = (req, res, next) => {
 
 // Authentication Required
 app.use(auth);
+
+app.get('/home', (req, res) => {
+	if (req.session.user) {
+		res.render('pages/home', {
+			user: req.session.user,
+		});
+	} else {
+		res.redirect('/login', { message: "Please login to access this page." });
+	}
+});
 
 app.get('/logout', (req, res) => {
 	req.session.destroy();
