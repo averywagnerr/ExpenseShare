@@ -106,66 +106,98 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-	res.render('pages/login');
+let errorMessage = req.query.error;
+let message = req.query.message;
+res.render("pages/login", { message: errorMessage || message });
 });
 
 app.get('/register', (req, res) => {
-	res.render('pages/register');
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+  res.render("pages/register", { message: errorMessage || message });
 });
 
 
 // Register
 app.post('/register', async (req, res) => {
-	//hash the password using bcrypt library
-	const hash = await bcrypt.hash(req.body.password, 10);
-
-	// To-DO: Insert username and hashed password into the 'users' table
-	db.tx(async t => {
-		return t.any(
-			'INSERT INTO users (username, password) VALUES ($1, $2);',
-			[req.body.username, hash]
+	db.tx(async (t) => {
+		const user = await t.oneOrNone(
+		  `SELECT * FROM users WHERE users.username = $1`,
+		  req.body.username
 		);
-	})
-		.then(users => {
-			res.redirect('pages/login');
-		})
-		.catch(err => {
-			res.render('pages/register', {
-				message: "Username is already in use, please enter another username."
-			});
-		});
+	
+		if (user) {
+		  throw new Error(`User ${req.body.username} already exists!`);
+		}
+	  }).catch((e) => {
+		console.log(e);
+		res.redirect("/login?error=" + encodeURIComponent(e.message));
+	  });
+	  // hash the password using bcrypt library
+	  const hash = await bcrypt.hash(req.body.password, 10);
+	  try {
+		await db.none("INSERT INTO users(username, password) VALUES ($1, $2);", [
+		  req.body.username,
+		  hash,
+		]);
+	
+		res.redirect(
+		  "/login?message=" + encodeURIComponent("Successfully registered!")
+		);
+	  } catch (e) {
+		console.log(e);
+		// res.redirect("/register");
+		res.redirect("/register?error=" + encodeURIComponent(e.message));
+	  }
 });
-
-app.get('/login', (req, res) => {
-	res.render('pages/login');
-});
-
 
 app.post('/login', async (req, res) => {
 
-	const [user] = await db.tx(async t => {
-		return t.any(
-			`SELECT * FROM users WHERE username = '${req.body.username}'`,
+	db.tx(async (t) => {
+		// check if password from request matches with password in DB
+		const user = await t.oneOrNone(
+		  `SELECT * FROM users WHERE users.username = $1`,
+		  req.body.username
 		);
-	})
-
-	if (user?.username) {
+	
+		if (!user) {
+		  throw new Error(`User ${req.body.username} not found in database.`);
+		}
+	
 		const match = await bcrypt.compare(req.body.password, user.password);
+		if (!match) {
+		  throw new Error(`The password entered is incorrect.`);
+		}
+		req.session.user = user;
+		req.session.save();
+		res.redirect("/home");
+	  }).catch((err) => {
+		console.log(err);
+		res.redirect("/login?error=" + encodeURIComponent(err.message));
+	  });
+	// const [user] = await db.tx(async t => {
+	// 	return t.any(
+	// 		`SELECT * FROM users WHERE username = '${req.body.username}'`,
+	// 	);
+	// })
 
-		if (match) {
-			req.session.user = user;
-			req.session.save();
-			res.redirect('/home');
-		}
-		else {
-			res.render('pages/login', {
-				message: "Incorrect username or password.",
-			});
-		}
-	}
-	else {
-		res.redirect('/register');
-	}
+	// if (user?.username) {
+	// 	const match = await bcrypt.compare(req.body.password, user.password);
+
+	// 	if (match) {
+	// 		req.session.user = user;
+	// 		req.session.save();
+	// 		res.redirect('/home');
+	// 	}
+	// 	else {
+	// 		res.render('pages/login', {
+	// 			message: "Incorrect username or password.",
+	// 		});
+	// 	}
+	// }
+	// else {
+	// 	res.redirect('/register');
+	// }
 });
 
 // Authentication Middleware.
@@ -184,6 +216,7 @@ app.get('/home', (req, res) => {
 	if (req.session.user) {
 		res.render('pages/home', {
 			user: req.session.user,
+			username: req.session.user.username
 		});
 	} else {
 		res.redirect('/login', { message: "Please login to access this page." });
