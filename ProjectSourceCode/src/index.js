@@ -102,7 +102,8 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-	res.redirect('/login'); //this will call the /anotherRoute route in the API
+	res.render('pages/landing')
+	// res.redirect('/login'); //this will call the /anotherRoute route in the API
 });
 
 app.get('/login', (req, res) => {
