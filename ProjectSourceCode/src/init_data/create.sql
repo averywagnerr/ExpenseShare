@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS user_to_groups (
 );
 
 CREATE TABLE IF NOT EXISTS user_to_transactions (
-	username VARCHAR(255) REFERENCES users,
+	username VARCHAR(50) REFERENCES users,
 	transaction_id INT REFERENCES transactions,
   is_sender BOOLEAN NOT NULL,
 	PRIMARY KEY (username, transaction_id)
