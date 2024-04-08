@@ -105,14 +105,10 @@ app.get("/welcome", (req, res) => {
 
 app.get("/", (req, res) => {
   res.render("pages/landing");
-  // res.redirect('/login'); //this will call the /anotherRoute route in the API
 });
 
-app.get("/login", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/login", { message: errorMessage || message });
-});
+
+/* ================ Register ================ */
 
 app.get("/register", (req, res) => {
   let errorMessage = req.query.error;
@@ -120,7 +116,6 @@ app.get("/register", (req, res) => {
   res.render("pages/register", { message: errorMessage || message });
 });
 
-// Register
 app.post("/register", async (req, res) => {
   db.tx(async (t) => {
     const user = await t.oneOrNone(
@@ -153,6 +148,14 @@ app.post("/register", async (req, res) => {
   }
 });
 
+/* ================ Login ================ */
+
+app.get("/login", (req, res) => {
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+  res.render("pages/login", { message: errorMessage || message, error: errorMessage });
+});
+
 app.post("/login", async (req, res) => {
   db.tx(async (t) => {
     // check if password from request matches with password in DB
@@ -176,29 +179,6 @@ app.post("/login", async (req, res) => {
     console.log(err);
     res.redirect("/login?error=" + encodeURIComponent(err.message));
   });
-  // const [user] = await db.tx(async t => {
-  // 	return t.any(
-  // 		`SELECT * FROM users WHERE username = '${req.body.username}'`,
-  // 	);
-  // })
-
-  // if (user?.username) {
-  // 	const match = await bcrypt.compare(req.body.password, user.password);
-
-  // 	if (match) {
-  // 		req.session.user = user;
-  // 		req.session.save();
-  // 		res.redirect('/home');
-  // 	}
-  // 	else {
-  // 		res.render('pages/login', {
-  // 			message: "Incorrect username or password.",
-  // 		});
-  // 	}
-  // }
-  // else {
-  // 	res.redirect('/register');
-  // }
 });
 
 // Authentication Middleware.
@@ -220,7 +200,10 @@ app.get("/home", (req, res) => {
       username: req.session.user.username,
     });
   } else {
-    res.redirect("/login", { message: "Please login to access this page." });
+    // res.redirect("/login", { message: "Please login to access this page." });
+    res.redirect(
+      "/login?error=" + encodeURIComponent("Please login to access this page.")
+    );
   }
 });
 
