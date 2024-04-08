@@ -56,13 +56,15 @@ app.get('/db', (_, res) => {
 	db.tx(async t => {
 		const users = await t.manyOrNone('SELECT * FROM users');
 		const groups = await t.manyOrNone('SELECT * FROM groups');
+		const transactions = await t.manyOrNone('SELECT * FROM transactions');
 
-		return { users, groups };
+		return { users, groups, transactions };
 	})
 		.then(data => {
 			queries = {
 				users: data.users,
 				groups: data.groups,
+				transactions: data.transactions,
 			};
 
 			res.send(queries);
