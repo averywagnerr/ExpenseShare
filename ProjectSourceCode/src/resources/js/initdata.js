@@ -1,10 +1,12 @@
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bcrypt = require('bcrypt'); //  To hash passwords
 
+// INFO: User data for the form [username, password]
 userdata = [["admin", "admin"], ["user", "user"], ["test", "test"], ["mason", "mason"],
 ["connor", "connor"], ["avery", "avery"], ["mariana", "mariana"], ["tyler", "tyler"]];
 
-groupdata = ["admin group"];
+// INFO: Group data for the form [groupname]
+groupdata = ["admin group", "user group", "test group"];
 
 const dbConfig = {
 	host: 'db',
@@ -31,10 +33,19 @@ db.any('SELECT * FROM users').then((data) => {
 	if (data.length > 0) {
 		console.log('Users already exist in the database. Skipping insertion.');
 	} else {
-		console.log('No users found in the database. Inserting test data.');
+		console.log('No users found in the database. Inserting...');
 		insertUsers(userdata);
 	}
 }).catch((error) => { console.error('Error checking for existing users =>', error) });
+
+db.any('SELECT * FROM groups').then((data) => {
+	if (data.length > 0) {
+		console.log('Groups already exist in the database. Skipping insertion.');
+	} else {
+		console.log('No groups found in the database. Inserting...');
+		insertGroups(groupdata);
+	}
+}).catch((error) => { console.error('Error checking for existing groups =>', error) });
 
 async function insertUsers(users) {
 	var successes = 0;
@@ -47,10 +58,25 @@ async function insertUsers(users) {
 			await db.none('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
 			successes++;
 		} catch (error) {
-			console.error('Error inserting user:', error);
+			console.error('Error inserting user =>', error);
 		}
 	}
 	console.log(successes + ' users inserted successfully');
+}
+
+async function insertGroups(groups) {
+	var successes = 0;
+	for (let i = 0; i < groups.length; i++) {
+		const groupname = groups[i];
+
+		try {
+			await db.none('INSERT INTO groups (groupname) VALUES ($1)', [groupname]);
+			successes++;
+		} catch (error) {
+			console.error('Error inserting group =>', error);
+		}
+	}
+	console.log(successes + ' groups inserted successfully');
 }
 
 module.exports = { bcrypt, db };
