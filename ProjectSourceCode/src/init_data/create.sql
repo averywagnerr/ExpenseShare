@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
 		username VARCHAR(50) PRIMARY KEY,
-		password VARCHAR(60) NOT NULL
+		password VARCHAR(60) NOT NULL,
+		balance DECIMAL(10, 2) DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS groups (
@@ -27,3 +28,9 @@ CREATE TABLE IF NOT EXISTS user_to_transactions (
 );
 
 --TODO: Potentially add views to simplify queries
+
+-- CREATE VIEW user_transactions AS
+-- SELECT t.id, t.amount, t.description, t.created_at
+-- 	FROM transactions t
+-- 	JOIN user_to_transactions ut ON t.id = ut.transaction_id
+-- 	WHERE ut.username = ?;
