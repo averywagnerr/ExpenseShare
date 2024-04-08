@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 CREATE TABLE IF NOT EXISTS user_to_groups (
-	username VARCHAR(50) REFERENCES users,
+	username VARCHAR(50) REFERENCES users(username),
 	groupname VARCHAR(255) REFERENCES groups,
 	PRIMARY KEY (username, groupname)
 );

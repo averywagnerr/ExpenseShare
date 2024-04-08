@@ -5,8 +5,19 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 userdata = [["admin", "admin"], ["user", "user"], ["test", "test"], ["mason", "mason"],
 ["connor", "connor"], ["avery", "avery"], ["mariana", "mariana"], ["tyler", "tyler"]];
 
-// INFO: Group data for the form [groupname]
+// INFO: Group data for the form groupname
 groupdata = ["admin group", "user group", "test group"];
+
+// INFO: Transaction data for the form [sender, receiver, amount, description] 
+transactiondata = [["admin", "mason", 10000, "free monet"]];
+
+// INFO: Group membreship data of the form [username, groupname]
+groupmembershipdata = [["admin", "admin group"]];
+// groupmembershipdata = [["admin", "admin group"], ["mason", "admin group"], ["test", "test group"]];
+
+//INFO: TRansaction membership data of the form [transactionid, username, is_sender]
+transactionmembershipdata = [[1, "admin", true], [1, "mason", false]];
+
 
 const dbConfig = {
 	host: 'db',
@@ -29,23 +40,23 @@ db.connect()
 
 console.log('Entering database insertion queue...');
 
+// Slightly scuffed since it assumes if no users, then no groups, but oh well don't want the console spammed
 db.any('SELECT * FROM users').then((data) => {
 	if (data.length > 0) {
-		console.log('Users already exist in the database. Skipping insertion.');
+		console.log('Data already exists in the database. Skipping insertion.');
 	} else {
-		console.log('No users found in the database. Inserting...');
-		insertUsers(userdata);
+		console.log('No data found in the database. Inserting...');
+		Promise.all(
+			[insertUsers(userdata),
+			insertGroups(groupdata)])
+			.then(() => {
+				insertGroupMemberships(groupmembershipdata);
+				insertTransactions(transactiondata).then(() => {
+					insertTransactionMemberships(transactionmembershipdata);
+				});
+			});
 	}
 }).catch((error) => { console.error('Error checking for existing users =>', error) });
-
-db.any('SELECT * FROM groups').then((data) => {
-	if (data.length > 0) {
-		console.log('Groups already exist in the database. Skipping insertion.');
-	} else {
-		console.log('No groups found in the database. Inserting...');
-		insertGroups(groupdata);
-	}
-}).catch((error) => { console.error('Error checking for existing groups =>', error) });
 
 async function insertUsers(users) {
 	var successes = 0;
@@ -62,6 +73,7 @@ async function insertUsers(users) {
 		}
 	}
 	console.log(successes + ' users inserted successfully');
+	return;
 }
 
 async function insertGroups(groups) {
@@ -77,6 +89,57 @@ async function insertGroups(groups) {
 		}
 	}
 	console.log(successes + ' groups inserted successfully');
+}
+
+async function insertTransactions(transactions) {
+	var successes = 0;
+	for (let i = 0; i < transactions.length; i++) {
+		const sender = transactions[i][0];
+		const receiver = transactions[i][1];
+		const amount = transactions[i][2];
+		const description = transactions[i][3];
+
+		try {
+			await db.none('INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4)', [sender, receiver, amount, description]);
+			successes++;
+		} catch (error) {
+			console.error('Error inserting transaction =>', error);
+		}
+	}
+	console.log(successes + ' transactions inserted successfully');
+}
+
+async function insertGroupMemberships(groupmemberships) {
+	var successes = 0;
+	for (let i = 0; i < groupmemberships.length; i++) {
+		const username = groupmemberships[i][0];
+		const groupname = groupmemberships[i][1];
+
+		try {
+			await db.none('INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)', [username, groupname]);
+			successes++;
+		} catch (error) {
+			console.error('Error inserting group membership =>', error);
+		}
+	}
+	console.log(successes + ' group memberships inserted successfully');
+}
+
+async function insertTransactionMemberships(transactionmemberships) {
+	var successes = 0;
+	for (let i = 0; i < transactionmemberships.length; i++) {
+		const transactionid = transactionmemberships[i][0];
+		const username = transactionmemberships[i][1];
+		const is_sender = transactionmemberships[i][2];
+
+		try {
+			await db.none('INSERT INTO user_to_transactions (transaction_id, username, is_sender) VALUES ($1, $2, $3)', [transactionid, username, is_sender]);
+			successes++;
+		} catch (error) {
+			console.error('Error inserting transaction membership =>', error);
+		}
+	}
+	console.log(successes + ' transaction memberships inserted successfully');
 }
 
 module.exports = { bcrypt, db };
