@@ -1,14 +1,6 @@
 {{> message}}
 
- <head>
-    <div class = "textblock" id="image-text-relation">
-        {{!-- <img src="../resources/img/logo.jpg" alt="logo" style="width: 400px;" onerror="this.src='images/not_found.png';"> --}}
-        <div class = "bigtext">
-            <a class="Welcome mx-2">WELCOME TO EXPENSESHARE</a>
-        </div>
-        <div id = "Expense-share-desc" class = 'text'>ExpenseShare is an effortless and innovative way to keep track of a group's expenses. It allows for easy payment calculations, withdraws and deposits, as well as an overview of a group's payment history. </p></div>
-    </div>
-</head>
+
 
 <h1>Register a new account:</h1>
 
@@ -16,7 +8,8 @@
     <label for="username">Username:</label>
     <input type="text" name="username"/><br />
     <label for="password">Password:</label>
-    <input type="text" name="password"/><br />
+    {{!-- <input type="text" name="password"/><br /> --}}
+    <input type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required><br />
 
     <button id="submit_button" type="submit">
         Register
