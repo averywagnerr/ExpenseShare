@@ -1,6 +1,11 @@
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bcrypt = require('bcrypt'); //  To hash passwords
 
+userdata = [["admin", "admin"], ["user", "user"], ["test", "test"], ["mason", "mason"],
+["connor", "connor"], ["avery", "avery"], ["mariana", "mariana"], ["tyler", "tyler"]];
+
+groupdata = ["admin group"];
+
 const dbConfig = {
 	host: 'db',
 	port: 5432,
@@ -22,9 +27,6 @@ db.connect()
 
 console.log('Entering database insertion queue...');
 
-userdata = [["admin", "admin"], ["user", "user"], ["test", "test"], ["mason", "mason"],
-["connor", "connor"], ["avery", "avery"], ["mariana", "mariana"], ["tyler", "tyler"]];
-
 db.any('SELECT * FROM users').then((data) => {
 	if (data.length > 0) {
 		console.log('Users already exist in the database. Skipping insertion.');
@@ -34,24 +36,21 @@ db.any('SELECT * FROM users').then((data) => {
 	}
 }).catch((error) => { console.error('Error checking for existing users =>', error) });
 
-function insertUsers(users) {
+async function insertUsers(users) {
+	var successes = 0;
 	for (let i = 0; i < users.length; i++) {
 		const username = users[i][0];
 		const password = users[i][1];
-		bcrypt.hash(password, 10, (err, hash) => {
-			if (err) {
-				console.error('Error hashing password for ' + username, err);
-				return;
-			}
-			db.none('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash])
-				.then(() => {
-					console.log('User inserted successfully');
-				})
-				.catch((error) => {
-					console.error('Error inserting user:', error);
-				});
-		})
+
+		try {
+			const hash = await bcrypt.hash(password, 10);
+			await db.none('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
+			successes++;
+		} catch (error) {
+			console.error('Error inserting user:', error);
+		}
 	}
+	console.log(successes + ' users inserted successfully');
 }
 
 module.exports = { bcrypt, db };
