@@ -19,31 +19,31 @@ const axios = require("axios"); // To make HTTP requests from our server. We'll 
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
-  extname: "hbs",
-  layoutsDir: __dirname + "/views/layouts",
-  partialsDir: __dirname + "/views/partials",
+	extname: "hbs",
+	layoutsDir: __dirname + "/views/layouts",
+	partialsDir: __dirname + "/views/partials",
 });
 
 // database configuration
 const dbConfig = {
-  host: "db", // the database server
-  port: 5432, // the database port
-  database: process.env.POSTGRES_DB, // the database name
-  user: process.env.POSTGRES_USER, // the user account to connect with
-  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+	host: "db", // the database server
+	port: 5432, // the database port
+	database: process.env.POSTGRES_DB, // the database name
+	user: process.env.POSTGRES_USER, // the user account to connect with
+	password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
 const db = pgp(dbConfig);
 
 // test your database
 db.connect()
-  .then((obj) => {
-    console.log("Database connection successful"); // you can view this message in the docker compose logs
-    obj.done(); // success, release the connection;
-  })
-  .catch((error) => {
-    console.log("ERROR:", error.message || error);
-  });
+	.then((obj) => {
+		console.log("Database connection successful"); // you can view this message in the docker compose logs
+		obj.done(); // success, release the connection;
+	})
+	.catch((error) => {
+		console.log("ERROR:", error.message || error);
+	});
 
 // *****************************************************
 // <!-- Section 3 : App Settings -->
@@ -58,17 +58,17 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-  })
+	session({
+		secret: process.env.SESSION_SECRET,
+		saveUninitialized: false,
+		resave: false,
+	})
 );
 
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
+	bodyParser.urlencoded({
+		extended: true,
+	})
 );
 
 app.use(express.static("resources"));
@@ -79,137 +79,136 @@ app.use(express.static("resources"));
 
 // TODO - Include your API routes here
 app.get("/db", (_, res) => {
-  query = "SELECT * FROM users";
-  db.tx(async (t) => {
-    const users = await t.manyOrNone("SELECT * FROM users");
-    const groups = await t.manyOrNone("SELECT * FROM groups");
+	query = "SELECT * FROM users";
+	db.tx(async (t) => {
+		const users = await t.manyOrNone("SELECT * FROM users");
+		const groups = await t.manyOrNone("SELECT * FROM groups");
 
-    return { users, groups };
-  })
-    .then((data) => {
-      queries = {
-        users: data.users,
-        groups: data.groups,
-      };
+		return { users, groups };
+	})
+		.then((data) => {
+			queries = {
+				users: data.users,
+				groups: data.groups,
+			};
 
-      res.send(queries);
-    })
-    .catch((error) => {
-      console.log("ERROR:", error);
-    });
+			res.send(queries);
+		})
+		.catch((error) => {
+			console.log("ERROR:", error);
+		});
 });
 
 app.get("/welcome", (req, res) => {
-  res.json({ status: "success", message: "Welcome!" });
+	res.json({ status: "success", message: "Welcome!" });
 });
 
 app.get("/", (req, res) => {
-  res.render("pages/landing");
+	res.render("pages/landing");
 });
 
 
 /* ================ Register ================ */
 
 app.get("/register", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/register", { message: errorMessage || message });
+	let errorMessage = req.query.error;
+	let message = req.query.message;
+	res.render("pages/register", { message: errorMessage || message });
 });
 
 app.post("/register", async (req, res) => {
-  db.tx(async (t) => {
-    const user = await t.oneOrNone(
-      `SELECT * FROM users WHERE users.username = $1`,
-      req.body.username
-    );
+	try {
+		await db.tx(async (t) => {
+			const user = await t.oneOrNone(
+				`SELECT * FROM users WHERE users.username = $1`,
+				req.body.username
+			);
 
-    if (user) {
-      throw new Error(`User ${req.body.username} already exists!`);
-    }
-  }).catch((e) => {
-    console.log(e);
-    res.redirect("/login?error=" + encodeURIComponent(e.message));
-  });
-  // hash the password using bcrypt library
-  const hash = await bcrypt.hash(req.body.password, 10);
-  try {
-    await db.none("INSERT INTO users(username, password) VALUES ($1, $2);", [
-      req.body.username,
-      hash,
-    ]);
+			if (user != null) {
+				res.status(400).json({ error: `User ${req.body.username} already exists!` });
+				return;
+			}
 
-    res.redirect(
-      "/login?message=" + encodeURIComponent("Successfully registered!")
-    );
-  } catch (e) {
-    console.log(e);
-    // res.redirect("/register");
-    res.redirect("/register?error=" + encodeURIComponent(e.message));
-  }
+			// Hash the password using bcrypt library
+			const hash = await bcrypt.hash(req.body.password, 10);
+			await t.none("INSERT INTO users(username, password) VALUES ($1, $2);", [
+				req.body.username,
+				hash,
+			]);
+
+			// Redirect to the login page with a success message
+			res.redirect(
+				"/login?message=" + encodeURIComponent("Successfully registered!")
+			);
+		});
+	} catch (e) {
+		console.log(e);
+		res.status(500).json({ error: "An error occurred while registering the user." });
+	}
 });
 
 /* ================ Login ================ */
 
 app.get("/login", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/login", { message: errorMessage || message, error: errorMessage });
+	let errorMessage = req.query.error;
+	let message = req.query.message;
+	res.render("pages/login", { message: errorMessage || message, error: errorMessage });
 });
 
 app.post("/login", async (req, res) => {
-  db.tx(async (t) => {
-    // check if password from request matches with password in DB
-    const user = await t.oneOrNone(
-      `SELECT * FROM users WHERE users.username = $1`,
-      req.body.username
-    );
+	db.tx(async (t) => {
+		// check if password from request matches with password in DB
+		const user = await t.oneOrNone(
+			`SELECT * FROM users WHERE users.username = $1`,
+			req.body.username
+		);
 
-    if (!user) {
-      throw new Error(`User ${req.body.username} not found in database.`);
-    }
+		if (!user) {
+			throw new Error(`User ${req.body.username} not found in database.`);
+		}
 
-    const match = await bcrypt.compare(req.body.password, user.password);
-    if (!match) {
-      throw new Error(`The password entered is incorrect.`);
-    }
-    req.session.user = user;
-    req.session.save();
-    res.redirect("/home");
-  }).catch((err) => {
-    console.log(err);
-    res.redirect("/login?error=" + encodeURIComponent(err.message));
-  });
+		const match = await bcrypt.compare(req.body.password, user.password);
+		if (!match) {
+			throw new Error(`The password entered is incorrect.`);
+		}
+		req.session.user = user;
+		req.session.save();
+		res.redirect("/home");
+	}).catch((err) => {
+		console.log(err);
+		res.redirect("/login?error=" + encodeURIComponent(err.message));
+	});
 });
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect("/login");
-  }
-  next();
+	if (!req.session.user) {
+		// Default to login page.
+		return res.redirect("/login");
+	}
+	next();
 };
 
 // Authentication Required
 app.use(auth);
 
 app.get("/home", (req, res) => {
-  if (req.session.user) {
-    res.render("pages/home", {
-      user: req.session.user,
-      username: req.session.user.username,
-    });
-  } else {
-    // res.redirect("/login", { message: "Please login to access this page." });
-    res.redirect(
-      "/login?error=" + encodeURIComponent("Please login to access this page.")
-    );
-  }
+	if (req.session.user) {
+		res.render("pages/home", {
+			user: req.session.user,
+			username: req.session.user.username,
+		});
+	} else {
+		// res.redirect("/login", { message: "Please login to access this page." });
+		res.redirect(
+			"/login?error=" + encodeURIComponent("Please login to access this page.")
+		);
+	}
 });
 
 app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.render("pages/logout");
+	req.session.destroy();
+	res.render("pages/logout");
 });
 
 // *****************************************************
