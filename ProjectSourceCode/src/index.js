@@ -107,7 +107,6 @@ app.get("/", (req, res) => {
 	res.render("pages/landing");
 });
 
-
 /* ================ Register ================ */
 
 app.get("/register", (req, res) => {
@@ -150,9 +149,12 @@ app.post("/register", async (req, res) => {
 /* ================ Login ================ */
 
 app.get("/login", (req, res) => {
-	let errorMessage = req.query.error;
-	let message = req.query.message;
-	res.render("pages/login", { message: errorMessage || message, error: errorMessage });
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+  res.render("pages/login", {
+    message: errorMessage || message,
+    error: errorMessage,
+  });
 });
 
 app.post("/login", async (req, res) => {
