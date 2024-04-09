@@ -142,6 +142,7 @@ app.post("/register", async (req, res) => {
 	} catch (e) {
 		console.log(e);
 		res.status(500).json({ error: "An error occurred while registering the user." });
+		res.render("pages/register", { message: "Internal server error while registering. Please try again!" });
 	}
 });
 
