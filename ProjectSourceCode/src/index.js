@@ -124,7 +124,8 @@ app.post("/register", async (req, res) => {
 			);
 
 			if (user != null) {
-				res.status(400).json({ error: `User ${req.body.username} already exists!` });
+				res.status(400);
+				res.render("pages/register", { message: "Username already exists!" });
 				return;
 			}
 
@@ -149,12 +150,12 @@ app.post("/register", async (req, res) => {
 /* ================ Login ================ */
 
 app.get("/login", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/login", {
-    message: errorMessage || message,
-    error: errorMessage,
-  });
+	let errorMessage = req.query.error;
+	let message = req.query.message;
+	res.render("pages/login", {
+		message: errorMessage || message,
+		error: errorMessage,
+	});
 });
 
 app.post("/login", async (req, res) => {
