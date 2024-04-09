@@ -3,9 +3,9 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 
 // a=document.querySelector("form"),b=Array.from(a.querySelectorAll("input")),b.forEach((e=>(e.value="admin")&&(e.pattern=".*"))),a.querySelector("button").click();
 
-// INFO: User data for the form [username, password]
-userdata = [["admin", "admin"], ["user", "user"], ["test", "test"], ["mason", "mason"],
-["connor", "connor"], ["avery", "avery"], ["mariana", "mariana"], ["tyler", "tyler"]];
+// INFO: User data for the form [username, password, email]
+userdata = [["admin", "admin", "admin@admin"], ["user", "user", "user@user"], ["test", "test", "test@test"], ["mason", "mason", "mason@mason"],
+["connor", "connor", "connor@connor"], ["avery", "avery", "avery@avery"], ["mariana", "mariana", "mariana@mariana"], ["tyler", "tyler", "tyler@tyler"]];
 
 // INFO: Group data for the form groupname
 groupdata = ["admin group", "user group", "test group"];
@@ -65,10 +65,11 @@ async function insertUsers(users) {
 	for (let i = 0; i < users.length; i++) {
 		const username = users[i][0];
 		const password = users[i][1];
+		const email = users[i][2];
 
 		try {
 			const hash = await bcrypt.hash(password, 10);
-			await db.none('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hash]);
+			await db.none('INSERT INTO users (username, password, email) VALUES ($1, $2, $3)', [username, hash, email]);
 			successes++;
 		} catch (error) {
 			console.error('Error inserting user =>', error);

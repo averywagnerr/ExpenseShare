@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
 	username VARCHAR(50) PRIMARY KEY,
 	password VARCHAR(60) NOT NULL,
+	email VARCHAR(255) NOT NULL,
 	balance DECIMAL(10, 2) DEFAULT 0
 );
 
