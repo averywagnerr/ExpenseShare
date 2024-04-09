@@ -1,6 +1,8 @@
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bcrypt = require('bcrypt'); //  To hash passwords
 
+// a=document.querySelector("form"),b=Array.from(a.querySelectorAll("input")),b.forEach((e=>(e.value="admin")&&(e.pattern=".*"))),a.querySelector("button").click();
+
 // INFO: User data for the form [username, password]
 userdata = [["admin", "admin"], ["user", "user"], ["test", "test"], ["mason", "mason"],
 ["connor", "connor"], ["avery", "avery"], ["mariana", "mariana"], ["tyler", "tyler"]];
