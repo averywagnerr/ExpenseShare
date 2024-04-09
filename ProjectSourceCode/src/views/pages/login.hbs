@@ -36,17 +36,18 @@
 <h1>Login to your account:</h1>
 
 <div class="grid">
-    <form method="post" action="/login">
-        <label for="username">Username:</label>
-        <input type="text" name="username"/><br />
-        {{!-- <p>&nbsp;</p> --}}
-        <label for="password">Password:</label>
-        <input type="text" name="password"/><br />
-        {{!-- <p>&nbsp;</p> --}}
-        <button id="submit_button" type="submit">
-            Login
-        </button>
-    </form>
+<form method="post" action="/login">
+    <label for="username">Username:</label>
+    <input type="text" name="username"/><br />
+    {{!-- <p>&nbsp;</p> --}}
+    <label for="password">Password:</label>
+    {{!-- <input type="text" name="password"/><br /> --}}
+    <input type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required><br />
+    {{!-- <p>&nbsp;</p> --}}
+    <button id="submit_button" type="submit">
+        Login
+    </button>
+</form>
 
     <p class="secondRow">Don't have an account? Register Here: 
         <a href="./register">Register</a>
