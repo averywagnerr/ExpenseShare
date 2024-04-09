@@ -129,14 +129,12 @@ app.post("/register", async (req, res) => {
 				return;
 			}
 
-			// Hash the password using bcrypt library
 			const hash = await bcrypt.hash(req.body.password, 10);
 			await t.none("INSERT INTO users(username, password) VALUES ($1, $2);", [
 				req.body.username,
 				hash,
 			]);
 
-			// Redirect to the login page with a success message
 			res.redirect(
 				"/login?message=" + encodeURIComponent("Successfully registered!")
 			);
