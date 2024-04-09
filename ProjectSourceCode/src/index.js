@@ -107,7 +107,6 @@ app.get("/", (req, res) => {
   res.render("pages/landing");
 });
 
-
 /* ================ Register ================ */
 
 app.get("/register", (req, res) => {
@@ -126,10 +125,15 @@ app.post("/register", async (req, res) => {
     if (user) {
       throw new Error(`User ${req.body.username} already exists!`);
     }
-  }).catch((e) => {
-    console.log(e);
-    res.redirect("/login?error=" + encodeURIComponent(e.message));
-  });
+  })
+    // .then((data) => {
+    //   res.status(200);
+    // })
+    .catch((e) => {
+      console.log(e);
+      res.status(400);
+      res.redirect("/login?error=" + encodeURIComponent(e.message));
+    });
   // hash the password using bcrypt library
   const hash = await bcrypt.hash(req.body.password, 10);
   try {
@@ -137,12 +141,13 @@ app.post("/register", async (req, res) => {
       req.body.username,
       hash,
     ]);
-
+    // res.status(200);
     res.redirect(
       "/login?message=" + encodeURIComponent("Successfully registered!")
     );
   } catch (e) {
     console.log(e);
+    res.status(400);
     // res.redirect("/register");
     res.redirect("/register?error=" + encodeURIComponent(e.message));
   }
@@ -153,7 +158,10 @@ app.post("/register", async (req, res) => {
 app.get("/login", (req, res) => {
   let errorMessage = req.query.error;
   let message = req.query.message;
-  res.render("pages/login", { message: errorMessage || message, error: errorMessage });
+  res.render("pages/login", {
+    message: errorMessage || message,
+    error: errorMessage,
+  });
 });
 
 app.post("/login", async (req, res) => {
