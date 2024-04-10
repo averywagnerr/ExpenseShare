@@ -195,21 +195,36 @@ app.post("/login", async (req, res) => {
       `SELECT * FROM users WHERE users.username = $1`,
       req.body.username
     );
-
     if (!user) {
-      throw new Error(`User ${req.body.username} not found in database.`);
+      // res.status(404);
+      // res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
+      // return;
+      // throw new Error(
+      //   `User ${req.body.username} not found in database.`
+      // ).status(404);
+      var err = new Error(`User ${req.body.username} not found in database.`);
+      err.status = 404;
+      console.log(`Error: ${err.message}, ${err.status}`);
+      throw err;
     }
 
     const match = await bcrypt.compare(req.body.password, user.password);
     if (!match) {
-      throw new Error(`The password entered is incorrect.`);
+      // res.status(400);
+      // throw new Error(`The password entered is incorrect.`).status(400);
+      var err = new Error(`The password entered is incorrect.`);
+      err.status = 400;
+      console.log(`Error: ${err.message}, ${err.status}`);
+      throw err;
     }
     req.session.user = user;
     req.session.save();
-    res.redirect("/home");
+    res.redirect(200, "/home");
   }).catch((err) => {
-    console.log(err);
-    res.redirect("/login?error=" + encodeURIComponent(err.message));
+    console.error(err);
+    res.status(err.status);
+    res.render("pages/login", { message: err.message });
+    // res.redirect("/login?error=" + encodeURIComponent(err.message));
   });
 });
 
@@ -217,7 +232,10 @@ app.post("/login", async (req, res) => {
 const auth = (req, res, next) => {
   if (!req.session.user) {
     // Default to login page.
-    return res.redirect("/login");
+    // return res.redirect("/login");
+
+    // Default to landing page.
+    return res.redirect("/landing");
   }
   next();
 };
