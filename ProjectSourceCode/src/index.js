@@ -201,7 +201,7 @@ app.post("/login", async (req, res) => {
 		}
 		req.session.user = user;
 		req.session.save();
-		res.redirect(200, "/home");
+		res.redirect("/home");
 	}).catch((err) => {
 		console.error(err);
 		res.status(err.status);
