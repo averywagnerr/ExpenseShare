@@ -30,7 +30,7 @@
         <ul class="navbar-nav ml-auto">
             <a class="nav-item">
                 <a class="nav-link black-text">
-                  hi,user!
+                  hi,<td>{{username}}</td>!
                 </a>
             </a>
         </ul>
@@ -40,12 +40,12 @@
 
 <form <!--method="post" action="/login"-->>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
-    <label class = "box" {{balance}}></label>
+    <label class = "box" <td>{{amount}}</td>></label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
     <br>
     <label class="slightlysmallerbigtext black-text" for="members">Members:</label>
-        <label class = "box" {{members}}></label>
+        <label class = "box" <td>{{groupname}}></td></label>
     <!--<input type="text" name="password"/><br/>-->
 </form>
 
