@@ -108,9 +108,9 @@ describe("Testing Register API", () => {
 	 * Positive Testcase : Valid login credentials.
 	 * API: /login
 	 * Input: { username: "testuser", password: "GoodPassword123!" }
-	 * Expect: res.status == 200
-	 * Result: This test case should pass and return a status 200.
-	 * Explanation: The testcase will call the /login API with the following valid input and expects the API to return a status of 200
+	 * Expect: res.status == 302
+	 * Result: This test case should pass and return a status 302.
+	 * Explanation: The testcase will call the /login API with the following valid input and expects the API to return a status of 302
 	 */
 	it("Positive : /login", (done) => {
 		chai
@@ -118,7 +118,7 @@ describe("Testing Register API", () => {
 			.post("/login")
 			.send({ username: "testuser", password: "GoodPassword123!" })
 			.end((err, res) => {
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(302);
 				done();
 			});
 	});
