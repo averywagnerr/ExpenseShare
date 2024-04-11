@@ -93,128 +93,133 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  let passwordRegex = /^(?=.*d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-  if (!passwordRegex.test(req.body.password)) {
-    res.status(400);
-    res.render("pages/register", {
-      message:
-        "Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
-    });
-    return;
-    // res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
-    // return res
-    //   .status(400)
-    //   .send(
-    //     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
-    //   );
-  }
+	let passwordRegex = /^(?=.*d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+	if (!passwordRegex.test(req.body.password)) {
+		res.status(400);
+		res.render("pages/register", {
+			message:
+				"Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
+		});
+		return;
+		// res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
+		// return res
+		//   .status(400)
+		//   .send(
+		//     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
+		//   );
+	}
 
-  try {
-    await db.tx(async (t) => {
-      const user = await t.oneOrNone(
-        `SELECT * FROM users WHERE users.username = $1`,
-        req.body.username
-      );
+	try {
+		await db.tx(async (t) => {
+			const user = await t.oneOrNone(
+				`SELECT * FROM users WHERE users.username = $1`,
+				req.body.username
+			);
 
-      if (user) {
-        res.status(400);
-        res.render("pages/register", { message: "Username already exists!" });
-        return;
-        // return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
-        // throw new Error(`User ${req.body.username} already exists!`);
-      }
+			if (user) {
+				res.status(400);
+				res.render("pages/register", { message: "Username already exists!" });
+				return;
+				// return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
+				// throw new Error(`User ${req.body.username} already exists!`);
+			}
 
-      // Hash the password using bcrypt library
-      const hash = await bcrypt.hash(req.body.password, 10);
-      await t.none("INSERT INTO users(username, password) VALUES ($1, $2);", [
-        req.body.username,
-        hash,
-      ]);
+			// Hash the password using bcrypt library
+			const hash = await bcrypt.hash(req.body.password, 10);
+			await t.none("INSERT INTO users(username, password, email) VALUES ($1, $2, $3);", [
+				req.body.username,
+				hash,
+				req.body.email,
+			]);
 
-      // Redirect to the login page with a success message
-      res.redirect(
-        "/login?message=" + encodeURIComponent("Successfully registered!")
-      );
-      // return res.redirect(
-      //   200, "/login?message=" + encodeURIComponent("Successfully registered!")
-      // );
-    });
-  } catch (e) {
-    console.error(e);
-    res
-      .status(500)
-      .json({ error: "An error occurred while registering the user." });
-    res.render("pages/register", {
-      message: "Internal server error while registering. Please try again!",
-    });
-    // res.status(500).json({ error: "An error occurred while registering the user." });
-    // res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
-    // return res.status(400).send(e.message);
-    // res.status(500).json({ error: "An error occurred while registering the user." });
-  }
+			// Redirect to the login page with a success message
+			res.redirect(
+				"/login?message=" + encodeURIComponent("Successfully registered!")
+			);
+			// return res.redirect(
+			//   200, "/login?message=" + encodeURIComponent("Successfully registered!")
+			// );
+		});
+	} catch (e) {
+		console.error(e);
+		res
+			.status(500)
+			.json({ error: "An error occurred while registering the user." });
+		res.render("pages/register", {
+			message: "Internal server error while registering. Please try again!",
+		});
+		// res.status(500).json({ error: "An error occurred while registering the user." });
+		// res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
+		// return res.status(400).send(e.message);
+		// res.status(500).json({ error: "An error occurred while registering the user." });
+	}
 });
 
 /* ================ Login ================ */
 
 app.get("/login", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/login", {
-    message: errorMessage || message,
-    error: errorMessage,
-  });
+	let errorMessage = req.query.error;
+	let message = req.query.message;
+	res.render("pages/login", {
+		message: errorMessage || message,
+		error: errorMessage,
+	});
 });
 
 app.post("/login", async (req, res) => {
-  db.tx(async (t) => {
-    // check if password from request matches with password in DB
-    const user = await t.oneOrNone(
-      `SELECT * FROM users WHERE users.username = $1`,
-      req.body.username
-    );
-    if (!user) {
-      // res.status(404);
-      // res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
-      // return;
-      // throw new Error(
-      //   `User ${req.body.username} not found in database.`
-      // ).status(404);
-      var err = new Error(`User ${req.body.username} not found in database.`);
-      err.status = 404;
-      console.log(`Error: ${err.message}, ${err.status}`);
-      throw err;
-    }
+	db.tx(async (t) => {
+		// check if password from request matches with password in DB
+		const user = await t.oneOrNone(
+			`SELECT * FROM users WHERE users.username = $1`,
+			req.body.username
+		);
+		if (!user) {
+			// res.status(404);
+			// res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
+			// return;
+			// throw new Error(
+			//   `User ${req.body.username} not found in database.`
+			// ).status(404);
+			// var err = new Error(`User ${req.body.username} not found in database.`);
 
-    const match = await bcrypt.compare(req.body.password, user.password);
-    if (!match) {
-      // res.status(400);
-      // throw new Error(`The password entered is incorrect.`).status(400);
-      var err = new Error(`The password entered is incorrect.`);
-      err.status = 400;
-      console.log(`Error: ${err.message}, ${err.status}`);
-      throw err;
-    }
-    req.session.user = user;
-    req.session.save();
-    res.redirect(200, "/home");
-  }).catch((err) => {
-    console.error(err);
-    res.status(err.status);
-    res.render("pages/login", { message: err.message });
-    // res.redirect("/login?error=" + encodeURIComponent(err.message));
-  });
+			res.status(404);
+			// err.status = 404;
+			// console.log(`Error: ${err.message}, ${err.status}`);
+			// throw err;
+			res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
+			return
+		}
+
+		const match = await bcrypt.compare(req.body.password, user.password);
+		if (!match) {
+			// res.status(400);
+			// throw new Error(`The password entered is incorrect.`).status(400);
+			var err = new Error(`The password entered is incorrect.`);
+			err.status = 400;
+			console.log(`Error: ${err.message}, ${err.status}`);
+			throw err;
+		}
+		req.session.user = user;
+		req.session.save();
+		res.redirect(200, "/home");
+	}).catch((err) => {
+		console.error(err);
+		res.status(err.status);
+		res.render("pages/login", { message: err.message });
+		// res.redirect("/login?error=" + encodeURIComponent(err.message));
+	});
 });
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    // return res.redirect("/login");
+	if (!req.session.user) {
+		// Default to login page.
+		// return res.redirect("/login");
 
-    // Default to landing page.
-    return res.redirect("/landing");
-  }
-  next();
+		// Default to landing page.
+		return res.redirect("/landing");
+	}
+	next();
 };
 
 // Authentication Required
