@@ -1,0 +1,25 @@
+Tyler
+    HTML for the homepage
+    Resolving github errors
+    Getting site up
+    Tyler wants to add handlebars and more bootstrap
+    Help Mariana with notifications API
+Avery
+    Helped set up docker files
+    Writing test cases and code
+    Found out we need to use API session secrets
+Mariana
+    Logout page and index.js file
+    Also helped with test cases and UAT file
+    Looking into notifications system
+    Learned it notifications system needs an API
+Mason
+    Worked on database structure
+    Implemented table functions into docker file
+    Added sample data
+    Added index functionality to make sure database is good
+    Wants to add database functionality going forward
+Connor(Wrote this)
+    Worked on docker file and login page
+    Wants to add CSS to login and register pages
+    Trouble with github

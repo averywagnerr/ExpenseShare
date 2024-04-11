@@ -1,14 +1,39 @@
-{{!-- <style>
+{{> message}}
+
+<style>
     .grid {
-        display:grid;
+        
+        {{!-- width:600px; --}}
+        display: grid;
         row-gap: 20px;
         column-gap: 20px;
+        grid-template-columns: 33% 33% 33%;
+
+        {{!-- padding-left:auto;
+        padding-right:auto; --}}
+        text-align:center;
+        font-size:30px;
     }
     form{
-        grid-column-start: 1;
+        grid-column-start: 2;
+        grid-column-end: 3;
+        border: 5px;
+        border-style:solid;
+        border-color:#212529;
+        padding-left: 50px;
+        padding-right: 50px;
+        background-color: #dcdcdc;
+    }
+    .secondRow {
+        grid-row-start:2;
+        grid-column-start: 2;
         grid-column-end: 2;
     }
-</style> --}}
+    button {
+        color: #212529;
+        background-color:#92ffcd;
+    }
+</style>
 
 <style>
 
@@ -18,17 +43,24 @@
 
 <div class="grid">
 <form method="post" action="/login">
+    <p>&nbsp;</p>
     <label for="username">Username:</label>
     <input type="text" name="username"/><br />
-    {{!-- <p>&nbsp;</p> --}}
+    <p>&nbsp;</p>
     <label for="password">Password:</label>
-    <input type="text" name="password"/><br />
-    {{!-- <p>&nbsp;</p> --}}
+    {{!-- <input type="text" name="password"/><br /> --}}
+    <input type="password" id="password" name="password" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required><br />
+    <p>&nbsp;</p>
     <button id="submit_button" type="submit">
         Login
     </button>
+    <p>&nbsp;</p>
 </form>
 
-<p>Don't have an account? Register Here: <a href="./register">Register</a></p>
+    <p class="secondRow">Don't have an account? 
+        <br>Register Here: 
+        <a href="./register">Register</a>
+    </p>
 
 </div>
+<p style="padding-bottom:50px">&nbsp;</p>
