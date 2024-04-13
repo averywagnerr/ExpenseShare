@@ -132,6 +132,40 @@ app.post("/register", async (req, res) => {
 				req.body.email,
 			]);
 
+
+			var nodemailer = require('nodemailer');
+
+			const transporter = nodemailer.createTransport({
+				service: 'gmail',
+				host: 'smtp.gmail.com',
+				port: 465,
+				secure: true,
+				auth: {
+				user: 'donotreply.expenseshare@gmail.com',
+				pass: 'Super secret',
+				},
+			});
+			
+			var mailOptions = {
+				from: 'donotreply.expenseshare@gmail.com',
+				to: req.body.email,
+				subject: 'Welcome to ExpenseShare!',
+				html: '<h1>Welcome!</h1> <br> ' +
+				'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
+				'Explore the application and have fun! <br> <br>' +
+				'If its not financially responsible, account me out!! <br> ' +
+				'We are funny too :) <br> <br>'
+			};
+			
+			transporter.sendMail(mailOptions, function(error, info){
+				if (error) {
+				console.log(error);
+				} else {
+				console.log('Email sent: ' + info.response);
+				}
+			});
+
+
 			// Redirect to the login page with a success message
 			res.redirect(
 				"/login?message=" + encodeURIComponent("Successfully registered!")
@@ -201,6 +235,36 @@ app.post("/login", async (req, res) => {
 		}
 		req.session.user = user;
 		req.session.save();
+
+
+		var nodemailer = require('nodemailer');
+
+		const transporter = nodemailer.createTransport({
+			service: 'gmail',
+			host: 'smtp.gmail.com',
+			port: 465,
+			secure: true,
+			auth: {
+			user: 'donotreply.expenseshare@gmail.com',
+			pass: 'Super secret',
+			},
+		});
+		
+		var mailOptions = {
+			from: 'donotreply.expenseshare@gmail.com',
+			to: req.body.email,
+			subject: 'Welcome to ExpenseShare!',
+			text: 'Thank you for making an account with us!'
+		};
+
+		transporter.sendMail(mailOptions, function(error, info){
+			if (error) {
+			console.log(error);
+			} else {
+			console.log('Email sent: ' + info.response);
+			}
+		});
+
 		res.redirect("/home");
 	}).catch((err) => {
 		console.error(err);
