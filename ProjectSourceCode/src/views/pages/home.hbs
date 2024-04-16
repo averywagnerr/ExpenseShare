@@ -36,7 +36,7 @@
 
 <form <!--method="post" action="/login"-->>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
-    <label class = "box" {{balance}}></label>
+    <label class = "box"></label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
     <br>
@@ -58,23 +58,6 @@
     Send
 </button>
 </div>
-
-
-<div class = "box">
-    <form>
-        <label class="black-text box-titles">Expense Share</label>
-        <br>
-        <label class="black-text" for="expense-amount">Expense:</label>
-        <input type="text" name="expense-amount"/><br/>
-        <label class="black-text" type="percent-to-pay">Amount Owed:</label>
-        <input type="text" name="share-amount"/><br/>
-    </form>
-
-    <button id="calculate_button" type="submit" class="black-text">
-        Pay
-    </button>
-</div>
-<br>
 
 <div Resume id="resume" class = "box">
 
@@ -105,4 +88,8 @@
 </body>
 </div>
 
-{{> expenses transactions=transactions}}
+{{> home/balance balance=balance}}
+
+{{> home/grouppay }}
+
+{{> home/expenses transactions=transactions}}
