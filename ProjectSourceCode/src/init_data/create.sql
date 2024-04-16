@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS groups (
-	groupname VARCHAR(255) PRIMARY KEY
+	token VARCHAR(10) PRIMARY KEY,
+	groupname VARCHAR(255),
+	-- groupname VARCHAR(255) PRIMARY KEY,
 );
 
 CREATE TABLE IF NOT EXISTS transactions (
@@ -20,14 +22,15 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 CREATE TABLE IF NOT EXISTS user_to_groups (
 	username VARCHAR(50) REFERENCES users(username),
-	groupname VARCHAR(255) REFERENCES groups,
-	PRIMARY KEY (username, groupname)
+	token VARCHAR(10) REFERENCES groups,
+	-- groupname VARCHAR(255) REFERENCES groups,
+	PRIMARY KEY (username, token)
 );
 
 CREATE TABLE IF NOT EXISTS user_to_transactions (
 	username VARCHAR(50) REFERENCES users,
 	transaction_id INT REFERENCES transactions,
-  is_sender BOOLEAN NOT NULL,
+  	is_sender BOOLEAN NOT NULL,
 	PRIMARY KEY (username, transaction_id)
 )
 

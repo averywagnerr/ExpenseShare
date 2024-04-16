@@ -53,6 +53,14 @@ app.use(express.static("resources"));
 // *****************************************************
 
 // TODO - Include your API routes here
+
+// *****************  Group Routes  ******************
+
+const groupRoutes = require('./routes/group');
+app.use(groupRoutes);
+
+// *****************************************************
+
 app.get('/db', (_, res) => {
 	query = 'SELECT * FROM users'
 	db.tx(async t => {
@@ -84,7 +92,7 @@ app.get("/", (req, res) => {
 	res.render("pages/landing");
 });
 
-/* ================ Register ================ */
+/* ================ User Register ================ */
 
 app.get("/register", (req, res) => {
 	let errorMessage = req.query.error;
@@ -101,6 +109,7 @@ app.post("/register", async (req, res) => {
 				"Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
 		});
 		return;
+		
 		// res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
 		// return res
 		//   .status(400)
@@ -155,7 +164,7 @@ app.post("/register", async (req, res) => {
 	}
 });
 
-/* ================ Login ================ */
+/* ================ User Login ================ */
 
 app.get("/login", (req, res) => {
 	let errorMessage = req.query.error;

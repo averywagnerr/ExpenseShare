@@ -12,9 +12,12 @@
 		"gulp": "^5.0.0",
 		"gulp-less": "^5.0.0",
 		"gulp-sass": "^5.1.0",
+		"jsonwebtoken": "^9.0.2",
 		"nodemon": "2.0.20",
 		"pg-promise": "^10.11.1",
-		"sass": "^1.74.1"
+		"sass": "^1.74.1",
+		"short-unique-id": "^5.0.3",
+		"uuidv4": "^6.2.13"
 	},
 	"devDependencies": {
 		"chai": "^4.2.0",
