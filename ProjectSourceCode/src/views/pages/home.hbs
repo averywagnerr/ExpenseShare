@@ -40,12 +40,12 @@
 
 <form <!--method="post" action="/login"-->>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
-    <label class = "box" {{balance}}></label>
+    <label class = "box">{{balance}}</label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
     <br>
     <label class="slightlysmallerbigtext black-text" for="members">Members:</label>
-        <label class = "box" {{members}}></label>
+        <label class = "box">{{members}}</label>
     <!--<input type="text" name="password"/><br/>-->
 </form>
 
@@ -54,9 +54,9 @@
         <label class="black-text box-titles">In/Out Cash</label>
         <br>
         <label class="black-text" for="deposit-amount">Deposit:</label>
-        <input type="text" name="deposit-amount"/><br/>
+        <input type="text" name="deposit-amount" name="deposit-amount"/><br/>
         <label class="black-text" type="withdraw-amount">Withdraw:</label>
-        <input type="text" name="withdraw-amount"/><br/>
+        <input type="text" name="withdraw-amount" name="withdrawl"/><br/>
     </form>
 <button id="send_button" type="submit" class="black-text">
     Send

@@ -230,6 +230,8 @@ app.get("/home", (req, res) => {
 		res.render("pages/home", {
 			user: req.session.user,
 			username: req.session.user.username,
+			balance: req.session.user.balance,
+			// members: req.session.user.members,
 		});
 	} else {
 		// res.redirect("/login", { message: "Please login to access this page." });
@@ -238,6 +240,18 @@ app.get("/home", (req, res) => {
 		);
 	}
 });
+
+app.post("/deposit", (req, res) => {
+
+	try {
+		
+
+
+	} catch(err) {
+
+	}
+
+})
 
 app.get("/logout", (req, res) => {
 	req.session.destroy();
