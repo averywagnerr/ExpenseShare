@@ -227,10 +227,20 @@ app.use(auth);
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
-		res.render("pages/home", {
-			user: req.session.user,
-			username: req.session.user.username,
+		// select from database all user transactions
+
+		const transactions = db.manyOrNone(
+			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			"SELECT * FROM transactions",
+			req.session.user.id
+		).then((transactions) => {
+			res.render("pages/home", {
+				user: req.session.user,
+				username: req.session.user.username,
+				transactions: transactions,
+			});
 		});
+
 	} else {
 		// res.redirect("/login", { message: "Please login to access this page." });
 		res.redirect(
