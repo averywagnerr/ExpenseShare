@@ -142,7 +142,7 @@ app.post("/register", async (req, res) => {
 				secure: true,
 				auth: {
 				user: 'donotreply.expenseshare@gmail.com',
-				pass: 'Super secret',
+				pass: process.env.PASS,
 				},
 			});
 			
@@ -246,7 +246,7 @@ app.post("/login", async (req, res) => {
 			secure: true,
 			auth: {
 			user: 'donotreply.expenseshare@gmail.com',
-			pass: 'Super secret',
+			pass: process.env.PASS,
 			},
 		});
 		
