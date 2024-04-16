@@ -237,6 +237,7 @@ app.get("/home", (req, res) => {
 			res.render("pages/home", {
 				user: req.session.user,
 				username: req.session.user.username,
+				balance: req.session.user.balance,
 				transactions: transactions,
 			});
 		});
