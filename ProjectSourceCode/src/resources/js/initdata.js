@@ -15,7 +15,6 @@ transactiondata = [["admin", "mason", 10000, "free monet admin"], ["connor", "ma
 
 // INFO: Group membreship data of the form [username, groupname]
 groupmembershipdata = [["admin", "admin group"]];
-// groupmembershipdata = [["admin", "admin group"], ["mason", "admin group"], ["test", "test group"]];
 
 //INFO: TRansaction membership data of the form [transactionid, username, is_sender]
 transactionmembershipdata = [[1, "admin", true], [1, "mason", false]];
