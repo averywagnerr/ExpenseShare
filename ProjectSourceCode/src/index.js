@@ -167,22 +167,6 @@ app.post("/register", async (req, res) => {
 
 
 
-			// Initiate the Optiic lib
-			const Optiic = require('optiic');
-			const optiic = new Optiic({apiKey: process.env.API_KEY});
-			// You can supply a remote url
-			optiic.process({
-			url: 'https://optiic.dev/assets/images/samples/we-love-optiic.png'
-			})
-			.then(result => console.log(result))
-			// You can also supply a local image file
-			optiic.process({
-			image: 'path/to/image.png'
-			})
-			.then(result => console.log(result))
-
-
-
 			// Redirect to the login page with a success message
 			res.redirect(
 				"/login?message=" + encodeURIComponent("Successfully registered!")
