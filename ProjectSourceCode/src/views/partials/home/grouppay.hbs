@@ -1,16 +1,17 @@
-
 <div class = "box">
-    <form>
-        <label class="black-text box-titles">Group Pay</label>
-        <br>
-        <label class="black-text" for="expense-amount">Expense:</label>
-        <input type="text" name="expense-amount"/><br/>
-        <label class="black-text" type="percent-to-pay">Share:</label>
-        <input type="text" name="share-amount"/><br/>
+    <form method="POST" action="/groupexpense" >
+			<label class="black-text box-titles">Group Pay</label>
+			<br>
+			<label class="black-text" for="expense-amount">Expense:</label>
+			<input type="text" name="expenseamount"/><br/>
+			<label class="black-text" type="groupname">Groupname:</label>
+			<input type="text" name="groupname"/><br/>
+			<label class="black-text" type="groupname">Description:</label>
+			<input type="text" name="description"/><br/>
+			<button id="calculate_button" type="submit" class="black-text">
+				Send expense	
+			</button>
     </form>
 
-    <button id="calculate_button" type="submit" class="black-text">
-        Calculate
-    </button>
 </div>
 <br>
