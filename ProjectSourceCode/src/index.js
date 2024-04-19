@@ -255,26 +255,17 @@ app.post("/deposit", async (req, res) => {
 		console.log(req.body)
 		
 		let deposit = parseFloat(req.body.deposit_amount)
-		
-
 		let withdraw = parseFloat(req.body.withdraw_amount)
 
 		let curr_balance = parseFloat(req.session.user.balance)
-
-		console.log("deposit:", deposit)
-		console.log("withdraw:", withdraw)
-		console.log("userBal", curr_balance)
 
 		let newBalance = curr_balance + (deposit - withdraw)
 
 		newBalance = parseFloat(newBalance)
 
-		console.log("newBal", newBalance)
-
 		const query = await db.none(`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`)//update user balance in database
 		
-		console.log(`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`)
-		console.log("finalBal", req.session.user.balance)
+		req.session.user.balance = newBalance
 
 		res.render("pages/home", {//rerender page
 			balance: newBalance
