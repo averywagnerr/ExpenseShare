@@ -223,7 +223,9 @@ app.use(auth);
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
-		db.manyOrNone(
+		// select from database all user transactions
+
+		const transactions = db.manyOrNone(
 			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
 			"SELECT * FROM transactions",
 			req.session.user.id
@@ -236,6 +238,11 @@ app.get("/home", (req, res) => {
 			});
 		});
 
+	} else {
+		// res.redirect("/login", { message: "Please login to access this page." });
+		res.render(
+			"/login?error=" + encodeURIComponent("Please login to access this page.")
+		);
 	}
 });
 
@@ -307,7 +314,7 @@ app.post("/groupexpense", async function(req, res) {
 
 	for (let i = 0; i < members.length; i++) {
 		if (members[i] !== req.session.user.username) {
-			db.one("INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
+			await db.one("INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
 				[req.session.user.username, members[i], (req.body.expenseamount / members.length), req.body.description]).then((data) => {
 					console.log("Transaction data: ", data);
 					db.none("INSERT INTO user_to_transactions (username, transaction_id, is_sender) VALUES ($1, $2, $3)", [members[i], data.id, false])
