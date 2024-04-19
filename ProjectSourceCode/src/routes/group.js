@@ -1,33 +1,57 @@
 const express = require("express");
 const axios = require("axios");
-
 // const jwt = require('jsonwebtoken');
-const { bcrypt, db } = require("../resources/js/initdata");
-
 const ShortUniqueId = require("short-unique-id");
-
+// const { randomUUID } = new ShortUniqueId({ length: 10 });
+const { bcrypt, db, randomUUID } = require("../resources/js/initdata");
+const handlebars = require("express-handlebars");
+const Handlebars = require("handlebars");
+const path = require("path");
+const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const Router = express.Router();
+const hbs = handlebars.create({
+  extname: "hbs",
+  layoutsDir: __dirname + "/views/layouts",
+  partialsDir: __dirname + "/views/partials",
+});
 
 // let Group = require('../models/group');
 
-const { randomUUID } = new ShortUniqueId({ length: 10 });
-
-Router.get("/getGroup", (req, res) => {
+Router.get("/joinGroup", (req, res) => {
   let errorMessage = req.query.error;
   let message = req.query.message;
-  res.render("pages/joinGroup", { message: errorMessage || message });
+
+  if (req.session.user) {
+    res.render("pages/joinGroup", {
+      user: req.session.user,
+      username: req.session.user.username,
+      message: errorMessage || message,
+    });
+  }
+
+  // res.render("pages/joinGroup", { message: errorMessage || message });
+});
+
+Router.get("/createGroup", (req, res) => {
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+
+  if (req.session.user) {
+    res.render("pages/createGroup", {
+      user: req.session.user,
+      username: req.session.user.username,
+      message: errorMessage || message,
+    });
+  }
+
+  // res.render("pages/createGroup", { message: errorMessage || message });
 });
 
 /* ================ Create Group ================ */
 
 Router.post("/createGroup", async (req, res) => {
-  let tokenRegex = /^.{10}$/;
-  if (!tokenRegex.test(req.body.joincode)) {
-    res.status(400);
-    res.render("pages/createGroup", {
-      message: "Invalid join code. Code must be 8 characters long.",
-    });
-    return;
+  if (!req.session.user) {
+    return res.redirect("/home");
   }
 
   // Randomly generate a 10-char group token.
@@ -47,10 +71,13 @@ Router.post("/createGroup", async (req, res) => {
         hash,
         req.body.groupname,
       ]);
-
-      // Redirect to the login page with a success message
+      let groups = [req.session.user.groups];
+      groups.append(group);
+      req.session.save();
+      // Redirect to the home page with a success message
       res.redirect(
-        "/home?message=" + encodeURIComponent("Successfully created group!")
+        "/home?message=" + encodeURIComponent("Successfully created group!"),
+        { user: req.session.user, username: req.session.user.username }
       );
     });
   } catch (e) {
@@ -67,6 +94,10 @@ Router.post("/createGroup", async (req, res) => {
 /* ================ Join Group ================ */
 
 Router.get("/joinGroup", (req, res) => {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+
   let errorMessage = req.query.error;
   let message = req.query.message;
   res.render("pages/joinGroup", {
@@ -76,19 +107,17 @@ Router.get("/joinGroup", (req, res) => {
 });
 
 Router.post("/joinGroup", async (req, res) => {
+  let tokenRegex = /^.{10}$/;
+  if (!tokenRegex.test(req.body.token)) {
+    res.status(400);
+    res.render("pages/joinGroup", {
+      message: "Invalid join code. Code must be 10 characters long.",
+    });
+    return;
+  }
+
   db.tx(async (t) => {
-    // First, check if tokens match (PK)
-    const match = await bcrypt.compare(req.body.joincode, group.token);
-
-    if (!match) {
-      var err = new Error(`The join code entered is incorrect.`);
-      err.status = 400;
-      console.log(`Error: ${err.message}, ${err.status}`);
-      throw err;
-    }
-
     // Check if name from request matches with name in DB
-    // TODO : should this check / input from user even be included
     const group = await t.oneOrNone(
       `SELECT * FROM groups WHERE group.groupname = $1`,
       req.body.groupname
@@ -101,9 +130,23 @@ Router.post("/joinGroup", async (req, res) => {
       return;
     }
 
-    // req.session.user = user;
-    // req.session.save();
-    res.redirect("/home");
+    // check if tokens match (PK ?)
+    const match = await bcrypt.compare(req.body.token, group.token);
+
+    if (!match) {
+      var err = new Error(`The join code entered is incorrect.`);
+      err.status = 400;
+      console.log(`Error: ${err.message}, ${err.status}`);
+      throw err;
+    }
+
+    let groups = [req.session.user.groups];
+    groups.append(group);
+    req.session.save();
+    res.redirect("/home", {
+      user: req.session.user,
+      username: req.session.user.username,
+    });
   }).catch((err) => {
     console.error(err);
     res.status(err.status);
