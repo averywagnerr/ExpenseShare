@@ -20,9 +20,7 @@ const hbs = handlebars.create({
 	partialsDir: __dirname + "/views/partials",
 });
 
-// *****************************************************
 // <!-- Section 3 : App Settings -->
-// *****************************************************
 
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine("hbs", hbs.engine);
@@ -215,10 +213,6 @@ app.post("/login", async (req, res) => {
 // Authentication Middleware.
 const auth = (req, res, next) => {
 	if (!req.session.user) {
-		// Default to login page.
-		// return res.redirect("/login");
-
-		// Default to landing page.
 		return res.redirect("/landing");
 	}
 	next();
@@ -247,7 +241,7 @@ app.get("/home", (req, res) => {
 
 	} else {
 		// res.redirect("/login", { message: "Please login to access this page." });
-		res.redirect(
+		res.render(
 			"/login?error=" + encodeURIComponent("Please login to access this page.")
 		);
 	}
@@ -286,15 +280,6 @@ app.post("/deposit", async (req, res) => {
 			balance: newBalance
 		});
 
-		// res.redirect("/home");
-
-		// res.status(200).send()
-
-		// res.render("pages/home", {
-		// 	balance: req.session.user.balance,
-		// });
-
-
 	} catch(err) {
 
 		console.log(err)
@@ -304,10 +289,10 @@ app.post("/deposit", async (req, res) => {
 
 })
 
-app.post("/joingroup", function(req, res) {
+app.post("/joingroup", async function(req, res) {
 	// First check if the group exists
 	let exists = false;
-	db.oneOrNone("SELECT * FROM groups WHERE groupname = $1", req.body.groupname)
+	await db.oneOrNone("SELECT * FROM groups WHERE groupname = $1", req.body.groupname)
 		.then((group) => {
 			if (group) {
 				exists = true;
@@ -331,8 +316,61 @@ app.post("/joingroup", function(req, res) {
 	}
 	//
 	// // Redirect to the home page with a success message
-	// res.redirect("pages/home", { message: encodeURIComponent("Successfully joined group.") });
 	res.render("pages/home", { message: "Successfully joined group." });
+});
+
+
+app.post("/groupexpense", async function(req, res) {
+	//INFO: Make sure the sender is in the group
+	let inGroup = false;
+	await db.oneOrNone("SELECT * FROM user_to_groups WHERE username = $1 AND groupname = $2",
+		[req.session.user.username, req.body.groupname])
+		.then((user) => {
+			if (user) {
+				inGroup = true;
+			}
+		})
+		.catch((err) => {
+			console.error(err);
+			res.render("pages/home", { message: "An error occurred while validating group membership.", error: true });
+			return;
+		});
+
+	if (!inGroup) {
+		res.render("pages/home", { message: "You are not in the group or this group does not exist!", error: true });
+		return;
+	}
+
+	let members = [];
+	await db.manyOrNone("SELECT username FROM user_to_groups WHERE groupname = $1", req.body.groupname)
+		.then((users) => {
+			users.forEach((user) => {
+				console.log("User: ", user);
+				members.push(user.username);
+			});
+		})
+		.catch((err) => {
+			console.error(err);
+			res.render("pages/home", { message: "An error occurred while fetching group members.", error: true });
+			return;
+		});
+
+	for (let i = 0; i < members.length; i++) {
+		if (members[i] !== req.session.user.username) {
+			await db.one("INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
+				[req.session.user.username, members[i], (req.body.expenseamount / members.length), req.body.description]).then((data) => {
+					console.log("Transaction data: ", data);
+					db.none("INSERT INTO user_to_transactions (username, transaction_id, is_sender) VALUES ($1, $2, $3)", [members[i], data.id, false])
+				})
+				.catch((err) => {
+					console.error(err);
+					res.render("pages/home", { message: "An error occurred while adding group expense.", error: true });
+					return;
+				});
+		}
+	}
+
+	res.render("pages/home", { message: "Successfully added group expense." });
 });
 
 app.get("/logout", (req, res) => {
