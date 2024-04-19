@@ -213,10 +213,6 @@ app.post("/login", async (req, res) => {
 // Authentication Middleware.
 const auth = (req, res, next) => {
 	if (!req.session.user) {
-		// Default to login page.
-		// return res.redirect("/login");
-
-		// Default to landing page.
 		return res.redirect("/landing");
 	}
 	next();
@@ -227,9 +223,7 @@ app.use(auth);
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
-		// select from database all user transactions
-
-		const transactions = db.manyOrNone(
+		db.manyOrNone(
 			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
 			"SELECT * FROM transactions",
 			req.session.user.id
@@ -242,11 +236,6 @@ app.get("/home", (req, res) => {
 			});
 		});
 
-	} else {
-		// res.redirect("/login", { message: "Please login to access this page." });
-		res.redirect(
-			"/login?error=" + encodeURIComponent("Please login to access this page.")
-		);
 	}
 });
 
