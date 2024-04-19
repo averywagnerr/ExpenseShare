@@ -20,9 +20,7 @@ const hbs = handlebars.create({
 	partialsDir: __dirname + "/views/partials",
 });
 
-// *****************************************************
 // <!-- Section 3 : App Settings -->
-// *****************************************************
 
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine("hbs", hbs.engine);
@@ -279,15 +277,12 @@ app.post("/joingroup", async function(req, res) {
 	}
 	//
 	// // Redirect to the home page with a success message
-	// res.redirect("pages/home", { message: encodeURIComponent("Successfully joined group.") });
 	res.render("pages/home", { message: "Successfully joined group." });
 });
 
 
 app.post("/groupexpense", async function(req, res) {
-	console.log("Group expense: ", req.body);
-
-	// Make sure the sender is in the group
+	//INFO: Make sure the sender is in the group
 	let inGroup = false;
 	await db.oneOrNone("SELECT * FROM user_to_groups WHERE username = $1 AND groupname = $2",
 		[req.session.user.username, req.body.groupname])
@@ -305,7 +300,6 @@ app.post("/groupexpense", async function(req, res) {
 	if (!inGroup) {
 		res.render("pages/home", { message: "You are not in the group or this group does not exist!", error: true });
 		return;
-
 	}
 
 	let members = [];
