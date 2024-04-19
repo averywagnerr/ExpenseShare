@@ -42,13 +42,13 @@
 <h1>Join Group</h1>
 
 <div class="grid">
-<form method="post" action="/login">
-    {{!-- <p>&nbsp;</p> --}}
-    {{!-- <label for="group-name">Group Name</label>
-    <input type="text" name="group-name"/><br /> --}}
+<form method="post" action="/joinGroup">
     <p>&nbsp;</p>
-    <label for="join-code">Join Code</label> 
-    <input type="text" name="join-code"/><br />
+    <label for="groupname">Group Name</label> 
+    <input type="text" name="groupname"/><br /> 
+    <p>&nbsp;</p>
+    <label for="token">Join Code</label> 
+    <input type="text" name="token"/><br />
     <p>&nbsp;</p>
     <button id="submit_button" type="submit">
         Join

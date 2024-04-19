@@ -223,10 +223,10 @@ app.post("/login", async (req, res) => {
 const auth = (req, res, next) => {
   if (!req.session.user) {
     // Default to login page.
-    return res.redirect("/login");
+    // return res.redirect("/login");
 
     // Default to landing page.
-    // return res.redirect("/landing");
+    return res.redirect("/");
   }
   next();
 };
@@ -236,146 +236,9 @@ app.use(auth);
 
 // *****************  Group Routes  ******************
 
-// app.use(groupRoutes, auth);
+app.use(groupRoutes, auth);
 
-app.get("/joinGroup", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-
-  if (req.session.user) {
-    res.render("pages/joinGroup", {
-      // user: req.session.user,
-      // username: req.session.user.username,
-      message: errorMessage || message,
-    });
-  }
-
-  // res.render("pages/joinGroup", { message: errorMessage || message });
-});
-
-app.get("/createGroup", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-
-  if (req.session.user) {
-    res.render("pages/createGroup", {
-      // user: req.session.user,
-      // username: req.session.user.username,
-      message: errorMessage || message,
-    });
-  }
-
-  // res.render("pages/createGroup", { message: errorMessage || message });
-});
-
-/* ================ Create Group ================ */
-
-app.post("/createGroup", async (req, res) => {
-  if (!req.session.user) {
-    return res.redirect("/home");
-  }
-
-  // Randomly generate a 10-char group token.
-  const token = randomUUID();
-
-  try {
-    await db.tx(async (t) => {
-      const group = await t.oneOrNone(
-        `SELECT * FROM groups WHERE groups.groupname = $1`,
-        req.body.groupname
-      );
-
-      // Hash the joincode using bcrypt library
-      const hash = await bcrypt.hash(token, 10);
-
-      await t.none("INSERT INTO groups(token, groupname) VALUES ($1, $2);", [
-        hash,
-        req.body.groupname,
-      ]);
-      let groups = [req.session.user.groups];
-      groups.append(group);
-      req.session.save();
-      // Redirect to the home page with a success message
-      res.redirect(
-        "/home?message=" + encodeURIComponent("Successfully created group!")
-        // { user: req.session.user, username: req.session.user.username }
-      );
-    });
-  } catch (e) {
-    console.error(e);
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the group." });
-    res.render("pages/createGroup", {
-      message: "Internal server error while creating group. Please try again!",
-    });
-  }
-});
-
-/* ================ Join Group ================ */
-
-app.get("/joinGroup", (req, res) => {
-  if (!req.session.user) {
-    return res.redirect("/login");
-  }
-
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/joinGroup", {
-    message: errorMessage || message,
-    error: errorMessage,
-  });
-});
-
-app.post("/joinGroup", async (req, res) => {
-  let tokenRegex = /^.{10}$/;
-  if (!tokenRegex.test(req.body.token)) {
-    res.status(400);
-    res.render("pages/joinGroup", {
-      message: "Invalid join code. Code must be 10 characters long.",
-    });
-    return;
-  }
-
-  db.tx(async (t) => {
-    // Check if name from request matches with name in DB
-    const group = await t.oneOrNone(
-      `SELECT * FROM groups WHERE group.groupname = $1`,
-      req.body.groupname
-    );
-    if (!group) {
-      res.status(404);
-      res.render("pages/joinGroup", {
-        message: `The group ${req.body.groupname} not found in database.`,
-      });
-      return;
-    }
-
-    // check if tokens match (PK ?)
-    const match = await bcrypt.compare(req.body.token, group.token);
-
-    if (!match) {
-      var err = new Error(`The join code entered is incorrect.`);
-      err.status = 400;
-      console.log(`Error: ${err.message}, ${err.status}`);
-      throw err;
-    }
-
-    let groups = [req.session.user.groups];
-    groups.append(group);
-    req.session.save();
-    res.redirect("/home", {
-      //   user: req.session.user,
-      //   username: req.session.user.username,
-    });
-  }).catch((err) => {
-    console.error(err);
-    res.status(err.status);
-    res.render("pages/createGroup", { message: err.message });
-    // res.redirect("/login?error=" + encodeURIComponent(err.message));
-  });
-});
-// ********************************
+// *****************************************************
 
 app.get("/home", (req, res) => {
   if (req.session.user) {

@@ -1,6 +1,9 @@
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bcrypt = require('bcrypt'); //  To hash passwords
 
+const ShortUniqueId = require("short-unique-id");
+const { randomUUID } = new ShortUniqueId({ length: 10 });
+
 // a=document.querySelector("form"),b=Array.from(a.querySelectorAll("input")),b.forEach((e=>(e.value="admin")&&(e.pattern=".*"))),a.querySelector("button").click();
 
 // INFO: User data for the form [username, password, email]
@@ -8,13 +11,15 @@ userdata = [["admin", "admin", "admin@admin"], ["user", "user", "user@user"], ["
 ["connor", "connor", "connor@connor"], ["avery", "avery", "avery@avery"], ["mariana", "mariana", "mariana@mariana"], ["tyler", "tyler", "tyler@tyler"]];
 
 // INFO: Group data for the form groupname
-groupdata = ["admin group", "user group", "test group"];
+groupdata = [["admintoken", "admin group"], ["1234567890", "user group"], ["testtoken", "test group"]];
+// groupdata = ["admin group", "user group", "test group"];
 
 // INFO: Transaction data for the form [sender, receiver, amount, description] 
-transactiondata = [["admin", "mason", 10000, "free monet"]];
+transactiondata = [["admin", "mason", 10000, "free money"]];
 
-// INFO: Group membreship data of the form [username, groupname]
-groupmembershipdata = [["admin", "admin group"]];
+////  INFO: Group membership data of the form [username, groupname]
+// INFO: Group membership data of the form [username, groupname, token]
+groupmembershipdata = [["admin",  "admin group", "admintoken"], ["test", "test group", "testtoken"]];
 // groupmembershipdata = [["admin", "admin group"], ["mason", "admin group"], ["test", "test group"]];
 
 //INFO: TRansaction membership data of the form [transactionid, username, is_sender]
@@ -82,10 +87,15 @@ async function insertUsers(users) {
 async function insertGroups(groups) {
 	var successes = 0;
 	for (let i = 0; i < groups.length; i++) {
-		const groupname = groups[i];
+		// const groupname = groups[i];
+		const token = groups[i][0];
+		const groupname = groups[i][1];
 
 		try {
-			await db.none('INSERT INTO groups (groupname) VALUES ($1)', [groupname]);
+			const hash = await bcrypt.hash(token, 10);
+
+			await db.none('INSERT INTO groups (token, groupname) VALUES ($1, $2)', [hash, groupname]);
+			// await db.none('INSERT INTO groups (groupname) VALUES ($1)', [groupname]);
 			successes++;
 		} catch (error) {
 			console.error('Error inserting group =>', error);
@@ -117,9 +127,23 @@ async function insertGroupMemberships(groupmemberships) {
 	for (let i = 0; i < groupmemberships.length; i++) {
 		const username = groupmemberships[i][0];
 		const groupname = groupmemberships[i][1];
+		const token = groupmemberships[i][2];
 
 		try {
-			await db.none('INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)', [username, groupname]);
+			const group = await db.oneOrNone(
+				`SELECT * FROM groups WHERE groups.groupname = $1`,
+				groupname
+			  );
+
+			const match = await bcrypt.compare(token, group.token);
+			if (!match) {
+				throw new Error(`Tokens do not match.`);
+			};
+
+			await db.none('INSERT INTO user_to_groups (username, token) VALUES ($1, $2)', [username, group.token]);
+			// await db.none('INSERT INTO user_to_groups (username, groupname, token) VALUES ($1, $2, $3)', [username, groupname, group.token]);
+
+			// await db.none('INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)', [username, groupname]);
 			successes++;
 		} catch (error) {
 			console.error('Error inserting group membership =>', error);
