@@ -227,12 +227,21 @@ app.use(auth);
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
-		res.render("pages/home", {
-			user: req.session.user,
-			username: req.session.user.username,
-			balance: req.session.user.balance,
-			// members: req.session.user.members,
+		// select from database all user transactions
+
+		const transactions = db.manyOrNone(
+			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			"SELECT * FROM transactions",
+			req.session.user.id
+		).then((transactions) => {
+			res.render("pages/home", {
+				user: req.session.user,
+				username: req.session.user.username,
+				transactions: transactions,
+				balance: req.session.user.balance,
+			});
 		});
+
 	} else {
 		// res.redirect("/login", { message: "Please login to access this page." });
 		res.redirect(
@@ -241,13 +250,52 @@ app.get("/home", (req, res) => {
 	}
 });
 
-app.post("/deposit", (req, res) => {
+app.post("/deposit", async (req, res) => {
 
 	try {
+
+
+		console.log(req.body)
 		
+		let deposit = parseFloat(req.body.deposit_amount)
+		
+
+		let withdraw = parseFloat(req.body.withdraw_amount)
+
+		let curr_balance = parseFloat(req.session.user.balance)
+
+		console.log("deposit:", deposit)
+		console.log("withdraw:", withdraw)
+		console.log("userBal", curr_balance)
+
+		let newBalance = curr_balance + (deposit - withdraw)
+
+		newBalance = parseFloat(newBalance)
+
+		console.log("newBal", newBalance)
+
+		const query = await db.none(`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`)//update user balance in database
+		
+		console.log(`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`)
+		console.log("finalBal", req.session.user.balance)
+
+		res.render("pages/home", {//rerender page
+			balance: newBalance
+		});
+
+		// res.redirect("/home");
+
+		// res.status(200).send()
+
+		// res.render("pages/home", {
+		// 	balance: req.session.user.balance,
+		// });
 
 
 	} catch(err) {
+
+		console.log(err)
+    	res.status(400).send()
 
 	}
 

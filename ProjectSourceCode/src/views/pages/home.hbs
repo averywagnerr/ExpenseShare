@@ -1,3 +1,4 @@
+
 <header>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -38,9 +39,9 @@
     </nav>
   </header>
 
-<form <!--method="post" action="/login"-->>
+<form>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
-    <label class = "box">{{balance}}</label>
+    <label class = "box" name="balance">{{balance}}</label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
     <br>
@@ -50,17 +51,17 @@
 </form>
 
 <div class = "box">
-    <form>
+    <form action="/deposit" method="post">
         <label class="black-text box-titles">In/Out Cash</label>
         <br>
         <label class="black-text" for="deposit-amount">Deposit:</label>
-        <input type="text" name="deposit-amount" name="deposit-amount"/><br/>
+        <input type="text" name="deposit_amount" placeholder="0" required/><br/>
         <label class="black-text" type="withdraw-amount">Withdraw:</label>
-        <input type="text" name="withdraw-amount" name="withdrawl"/><br/>
+        <input  type="text" name="withdraw_amount" placeholder="0" required/><br/>
+        <button id="send_button" type="submit" class="black-text">
+           Send
+        </button>
     </form>
-<button id="send_button" type="submit" class="black-text">
-    Send
-</button>
 </div>
 
 
@@ -109,3 +110,4 @@
 </body>
 </div>
 
+{{> expenses transactions=transactions}}
