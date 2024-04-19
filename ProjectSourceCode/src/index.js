@@ -59,14 +59,16 @@ app.get('/db', (_, res) => {
 		const users = await t.manyOrNone('SELECT * FROM users');
 		const groups = await t.manyOrNone('SELECT * FROM groups');
 		const transactions = await t.manyOrNone('SELECT * FROM transactions');
+		const userToGroups = await t.manyOrNone('SELECT * FROM user_to_groups');
 
-		return { users, groups, transactions };
+		return { users, groups, transactions, userToGroups };
 	})
 		.then(data => {
 			queries = {
 				users: data.users,
 				groups: data.groups,
 				transactions: data.transactions,
+				userToGroups: data.userToGroups,
 			};
 
 			res.send(queries);
@@ -237,6 +239,7 @@ app.get("/home", (req, res) => {
 			res.render("pages/home", {
 				user: req.session.user,
 				username: req.session.user.username,
+				balance: req.session.user.balance,
 				transactions: transactions,
 				balance: req.session.user.balance,
 			});
@@ -300,6 +303,37 @@ app.post("/deposit", async (req, res) => {
 	}
 
 })
+
+app.post("/joingroup", function(req, res) {
+	// First check if the group exists
+	let exists = false;
+	db.oneOrNone("SELECT * FROM groups WHERE groupname = $1", req.body.groupname)
+		.then((group) => {
+			if (group) {
+				exists = true;
+			}
+		})
+		.catch((err) => {
+			console.error(err);
+			res.render("pages/home", { message: "An error occurred while joining the group.", error: true });
+			return;
+		});
+
+	// If it exists, add the user to the group
+	if (!exists) {
+		db.none("INSERT INTO groups (groupname) VALUES ($1)", req.body.groupname)
+	} else {
+		db.none("INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)",
+			[req.session.user.username, req.body.groupname]).catch((_) => {
+				res.redirect("pages/home", { message: encodeURIComponent("Unsuccessfully joined group.") });
+				return;
+			});
+	}
+	//
+	// // Redirect to the home page with a success message
+	// res.redirect("pages/home", { message: encodeURIComponent("Successfully joined group.") });
+	res.render("pages/home", { message: "Successfully joined group." });
+});
 
 app.get("/logout", (req, res) => {
 	req.session.destroy();
