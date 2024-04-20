@@ -69,14 +69,37 @@
         <label class="black-text box-titles">Group Pay</label>
         <br>
         <label class="black-text" for="expense-amount">Expense:</label>
-        <input type="text" name="expense-amount"/><br/>
+        <input type="number" name="expense-amount"/><br/>
         <label class="black-text" type="percent-to-pay">Share:</label>
-        <input type="text" name="share-amount"/><br/>
+        <input type="number" name="share-amount"/><br/>
     </form>
 
-    <button id="calculate_button" type="submit" class="black-text">
+    <button id="calculate_button" type="submit" class="black-text" onclick=myFunction(expense-amount,percent-to-pay)>
         Calculate
     </button>
+    <div id="calculate_button_result">
+    </div>
+
+    {{!-- <script>
+      function myFunction(expense, percent) {
+        percent = percent/100;
+        expense = percent * expense;  
+        //return expense;
+        document.getElementById('calculate_button_result').innerHTML = expense;
+       }
+    </script> --}}
+
+    <script>
+      function myFunction(expense, percent) {
+        const cost = {{calculateCost expense-amount percent-to-pay}};
+        //return expense;
+        document.getElementById('calculate_button_result').innerHTML = cost;
+       }
+    </script>
+
+    <div>
+      {{calculateCost expense-amount percent-to-pay}}
+    </div>
 </div>
 <br>
 
