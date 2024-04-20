@@ -20,6 +20,7 @@ const hbs = handlebars.create({
 	partialsDir: __dirname + "/views/partials",
 });
 
+
 // *****************************************************
 // <!-- Section 3 : App Settings -->
 // *****************************************************
@@ -29,6 +30,7 @@ app.engine("hbs", hbs.engine);
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+
 
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
@@ -47,6 +49,7 @@ app.use(
 );
 
 app.use(express.static("resources"));
+
 
 // *****************************************************
 // <!-- Section 4 : API Routes -->
