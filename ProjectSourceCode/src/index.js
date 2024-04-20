@@ -17,7 +17,7 @@ const { bcrypt, db } = require('./resources/js/initdata'); // Connect from postg
 const hbs = handlebars.create({
 	extname: "hbs",
 	layoutsDir: __dirname + "/views/layouts",
-	partialsDir: __dirname + "/views/partials"
+	partialsDir: __dirname + "/views/partials",
 });
 
 
