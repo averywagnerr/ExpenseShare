@@ -68,10 +68,10 @@
     <form>
         <label class="black-text box-titles">Group Pay</label>
         <br>
-        <label class="black-text" for="expense">Expense total:</label>
-        <input type="number" name="expense" id="expense"/><br/>
-        <label class="black-text" for="share">Percent that you pay of the expense:</label>
-        <input type="number" name="share" id="share" /><br/>
+        <label class="black-text" for="expense-amount">Expense total:</label>
+        <input type="number" name="expense-amount" id="expense-amount"/><br/>
+        <label class="black-text" for="share-amount">Percent that you pay of the expense:</label>
+        <input type="number" name="share-amount" id="share-amount" /><br/>
     </form>
 
     <button id="calculate_button" type="submit" class="black-text" onclick="myFunction()">
@@ -84,8 +84,8 @@
 
     <script>
       function myFunction() {
-        const expense = document.getElementById('expense').value;
-        const percent = document.getElementById('share').value;
+        const expense = document.getElementById('expense-amount').value;
+        const percent = document.getElementById('share-amount').value;
         const percent_new = percent/100;
         const expense_new = percent_new * expense;
         //return expense;
