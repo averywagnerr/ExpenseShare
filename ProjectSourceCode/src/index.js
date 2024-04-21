@@ -28,6 +28,7 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
+
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
 app.use(
@@ -45,6 +46,7 @@ app.use(
 );
 
 app.use(express.static("resources"));
+
 
 // *****************************************************
 // <!-- Section 4 : API Routes -->
@@ -132,6 +134,57 @@ app.post("/register", async (req, res) => {
 				req.body.email,
 			]);
 
+
+			var nodemailer = require('nodemailer');
+
+			const transporter = nodemailer.createTransport({
+				service: 'gmail',
+				host: 'smtp.gmail.com',
+				port: 465,
+				secure: true,
+				auth: {
+				user: 'donotreply.expenseshare@gmail.com',
+				pass: process.env.PASS,
+				},
+			});
+			
+			var mailOptions = {
+				from: 'donotreply.expenseshare@gmail.com',
+				to: req.body.email,
+				subject: 'Welcome to ExpenseShare!',
+				html: '<h1>Welcome!</h1> <br> ' +
+				'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
+				'Explore the application and have fun! <br> <br>' +
+				'If its not financially responsible, account me out!! <br> ' +
+				'We are funny too :) <br> <br>'
+			};
+			
+			transporter.sendMail(mailOptions, function(error, info){
+				if (error) {
+				console.log(error);
+				} else {
+				console.log('Email sent: ' + info.response);
+				}
+			});
+
+
+
+			// // Initiate the Optiic lib
+			// const Optiic = require('optiic');
+			// const optiic = new Optiic({apiKey: process.env.API_KEY});
+			// // You can supply a remote url
+			// optiic.process({
+			// url: 'https://optiic.dev/assets/images/samples/we-love-optiic.png'
+			// })
+			// .then(result => console.log(result))
+			// // You can also supply a local image file
+			// optiic.process({
+			// image: 'path/to/image.png'
+			// })
+			// .then(result => console.log(result))
+
+
+
 			// Redirect to the login page with a success message
 			res.redirect(
 				"/login?message=" + encodeURIComponent("Successfully registered!")
@@ -201,6 +254,7 @@ app.post("/login", async (req, res) => {
 		}
 		req.session.user = user;
 		req.session.save();
+
 		res.redirect("/home");
 	}).catch((err) => {
 		console.error(err);
