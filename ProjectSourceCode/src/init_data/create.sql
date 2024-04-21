@@ -29,6 +29,21 @@ CREATE TABLE IF NOT EXISTS user_to_transactions (
 	transaction_id INT REFERENCES transactions,
   is_sender BOOLEAN NOT NULL,
 	PRIMARY KEY (username, transaction_id)
+);
+
+CREATE TABLE IF NOT EXISTS reciept_transactions (
+  id SERIAL PRIMARY KEY,
+  sender VARCHAR(50) REFERENCES users(username),
+  receiver VARCHAR(50) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  description TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_to_reciept_transactions (
+	username VARCHAR(50) REFERENCES users(username),
+	transaction_id INT REFERENCES reciept_transactions,
+	PRIMARY KEY (username, transaction_id)
 )
 
 --TODO: Potentially add views to simplify queries
