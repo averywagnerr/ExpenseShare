@@ -1,0 +1,18 @@
+<div class = "box">
+  <h2 class="black-text box-titles">Groups you are in</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Amount</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each groups}}
+			{{group.groupname}}
+    {{/each}}
+  </tbody>
+  </table>
+</div>

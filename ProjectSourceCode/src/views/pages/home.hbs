@@ -1,3 +1,4 @@
+
 <header>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,22 +10,17 @@
         crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../../resources/css/style.css">
-
+    <link rel="stylesheet" href="../../resources/css/tailwind.css">
     <div name="grid">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-
     <!-- Compiled and minified JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <link rel="stylesheet" href="../../resources/css/style.css">
+        <link rel="stylesheet" href="../../resources/css/tailwind.css">
     </div>
 
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-        <a class="navbar-brand"></a>
-          <a class="nav-item">
-              <a class="bigtext black-text">ExpenseShare</a>
-      </div>
+    
   
       <div class="navbar-collapse collapse order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
@@ -38,29 +34,32 @@
     </nav>
   </header>
 
-<form <!--method="post" action="/login"-->>
+<form>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
-    <label class = "box" {{balance}}></label>
+    <label class = "box" name="balance">{{balance}}</label>
+    <label class = "box"></label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
     <br>
     <label class="slightlysmallerbigtext black-text" for="members">Members:</label>
-        <label class = "box" {{members}}></label>
+        <label class = "box">{{members}}</label>
     <!--<input type="text" name="password"/><br/>-->
 </form>
 
+{{> message}}
+
 <div class = "box">
-    <form>
+    <form action="/deposit" method="post">
         <label class="black-text box-titles">In/Out Cash</label>
         <br>
         <label class="black-text" for="deposit-amount">Deposit:</label>
-        <input type="text" name="deposit-amount"/><br/>
+        <input type="text" name="deposit_amount" placeholder="0" required/><br/>
         <label class="black-text" type="withdraw-amount">Withdraw:</label>
-        <input type="text" name="withdraw-amount"/><br/>
+        <input  type="text" name="withdraw_amount" placeholder="0" required/><br/>
+        <button id="send_button" type="submit" class="black-text">
+           Send
+        </button>
     </form>
-<button id="send_button" type="submit" class="black-text">
-    Send
-</button>
 </div>
 
 
@@ -139,3 +138,11 @@
 </body>
 </div>
 
+{{> home/balance balance=balance}}
+
+{{> home/grouppay }}
+
+{{> home/expenses transactions=transactions}}
+
+
+{{> home/joingroup }}
