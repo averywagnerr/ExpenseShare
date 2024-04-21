@@ -51,6 +51,31 @@ app.use(
 app.use(express.static("resources"));
 
 
+
+const multer = require("multer");
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/")
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  },
+});
+
+const uploadStorage = multer({ storage: storage });
+
+app.post("/upload", uploadStorage.single("file"), (req, res) => {
+  console.log(req.file)
+return res.render("pages/home", {
+	user: req.session.user,
+	username: req.session.user.username,
+	});
+});
+
+
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
@@ -167,23 +192,6 @@ app.post("/register", async (req, res) => {
 				console.log('Email sent: ' + info.response);
 				}
 			});
-
-
-
-			// // Initiate the Optiic lib
-			// const Optiic = require('optiic');
-			// const optiic = new Optiic({apiKey: process.env.API_KEY});
-			// // You can supply a remote url
-			// optiic.process({
-			// url: 'https://optiic.dev/assets/images/samples/we-love-optiic.png'
-			// })
-			// .then(result => console.log(result))
-			// // You can also supply a local image file
-			// optiic.process({
-			// image: 'path/to/image.png'
-			// })
-			// .then(result => console.log(result))
-
 
 
 			// Redirect to the login page with a success message
