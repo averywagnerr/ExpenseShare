@@ -287,10 +287,10 @@ app.get("/home", (req, res) => {
 		// select from database all user transactions
 
 		db.manyOrNone(
-			"SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			"SELECT * FROM transactions where sender = $1 or receiver = $1",
 			[req.session.user.username]
 		).then((transactions) => {
-			// console.log(transactions);
+			console.log(transactions);
 			res.render("pages/home", {
 				user: req.session.user,
 				username: req.session.user.username,
@@ -411,7 +411,6 @@ app.post("/groupexpense", async function(req, res) {
 		if (members[i] !== req.session.user.username) {
 			await db.one("INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
 				[req.session.user.username, members[i], (req.body.expenseamount / members.length), req.body.description]).then((data) => {
-					console.log("Transaction data: ", data);
 					db.none("INSERT INTO user_to_transactions (username, transaction_id, is_sender) VALUES ($1, $2, $3)", [members[i], data.id, false])
 				})
 				.catch((err) => {

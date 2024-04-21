@@ -11,7 +11,7 @@ userdata = [["admin", "admin", "admin@admin"], ["user", "user", "user@user"], ["
 groupdata = ["admin group", "user group", "test group"];
 
 // INFO: Transaction data for the form [sender, receiver, amount, description] 
-transactiondata = [["admin", "mason", 10000, "free monet admin"], ["connor", "mason", 10000, "free moneeet"], ["tyler", "mason", 10000, "free money"]];
+transactiondata = [["admin", "mason", 10000, "free monet admin"], ["connor", "mason", 10000, "free moneeet"], ["tyler", "mason", 10000, "free money"], ["mason", "admin", 200, "bye money"]];
 
 // INFO: Group membreship data of the form [username, groupname]
 groupmembershipdata = [["admin", "admin group"]];

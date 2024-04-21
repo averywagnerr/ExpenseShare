@@ -1,4 +1,3 @@
-
 <div class = "box">
   <h2 class="black-text box-titles">Expenses</h2>
 
@@ -6,20 +5,20 @@
   <thead>
     <tr>
       <th>Amount</th>
-      <th>Person</th>
+      <th>To/From</th>
       <th>Date</th>
     </tr>
   </thead>
   <tbody>
-	{{username}}
 	{{#each transactions}}
 		<tr>
-			{{#if (isEqual username receiver)}}
+			{{#if (isEqual ../username receiver)}}
 				<td class="text-green-500 font-bold">+{{ amount }}</td>
+				<td>{{ sender }}</td>
 			{{else}}
 				<td class="text-red-500 font-bold">-{{ amount }}</td>
+				<td>{{ receiver }}</td>
 			{{/if}}
-			<td>{{ sender }}</td>
 			<td>{{ date }}</td>
 		</tr>
 	{{/each}}
