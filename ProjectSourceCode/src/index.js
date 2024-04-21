@@ -27,6 +27,12 @@ Handlebars.registerHelper('isEqual', function(arg1, arg2, options) {
 	return false;
 });
 
+Handlebars.registerHelper('formatDate', function(datetime) {
+	const date = new Date(datetime);
+	const options = { month: 'short', day: 'numeric', year: 'numeric' };
+	return date.toLocaleDateString('en-US', options);
+});
+
 // <!-- Section 3 : App Settings -->
 
 // Register `hbs` as our view engine using its bound `engine()` function.
