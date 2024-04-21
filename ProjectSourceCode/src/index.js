@@ -28,7 +28,6 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
-
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
 app.use(
@@ -88,7 +87,7 @@ app.post("/upload", uploadStorage.single("file"), (req, res) => {
 	var purchase_subcategory = "";
 	var total_amount = "";
 	var reciept_parts = resp.document.toString().split(':');
-	for (var i = 0; i < partsArray.length; i++)
+	for (var i = 0; i < reciept_parts.length; i++)
 	{
 		if (reciept_parts[i] == "Purchase Subcategory")
 		{
@@ -111,6 +110,16 @@ app.post("/upload", uploadStorage.single("file"), (req, res) => {
 		}
 	}
 
+	const fs = require('fs');
+
+	try {
+		fs.unlinkSync(path);
+		console.log('File deleted!');
+	  } catch (err) {
+		// Handle specific error if any
+		console.error(err.message);
+	  }
+
 	db.tx(async t => {
 		await db.one("INSERT INTO reciept_transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
 		[req.session.user.username, supplier_name, total_amount, purchase_subcategory]).then((data) => {
@@ -126,10 +135,28 @@ app.post("/upload", uploadStorage.single("file"), (req, res) => {
   })
 
 
-return res.render("pages/home", {
-	user: req.session.user,
-	username: req.session.user.username,
+  const reciept_transactions = db.manyOrNone(
+	// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+	"SELECT * FROM reciept_transactions",
+	req.session.user.id
+	).then((reciept_transactions) => {
+		const transactions = db.manyOrNone(
+			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			"SELECT * FROM transactions",
+			req.session.user.id
+			).then((transactions) => {
+				res.render("pages/home", {
+				user: req.session.user,
+				username: req.session.user.username,
+				balance: req.session.user.balance,
+				reciept_transactions: reciept_transactions,
+				transactions: transactions,
+				balance: req.session.user.balance,
+			});
+		});
 	});
+
+return;
 });
 
 
@@ -353,12 +380,19 @@ app.get("/home", (req, res) => {
 			"SELECT * FROM transactions",
 			req.session.user.id
 		).then((transactions) => {
-			res.render("pages/home", {
-				user: req.session.user,
-				username: req.session.user.username,
-				balance: req.session.user.balance,
-				transactions: transactions,
-				balance: req.session.user.balance,
+			const reciept_transactions = db.manyOrNone(
+				// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+				"SELECT * FROM reciept_transactions",
+				req.session.user.id
+			).then((reciept_transactions) => {
+				res.render("pages/home", {
+					user: req.session.user,
+					username: req.session.user.username,
+					balance: req.session.user.balance,
+					transactions: transactions,
+					reciept_transactions: reciept_transactions,
+					balance: req.session.user.balance,
+				});
 			});
 		});
 

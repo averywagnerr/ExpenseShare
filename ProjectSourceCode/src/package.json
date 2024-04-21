@@ -9,6 +9,7 @@
 		"express": "^4.6.1",
 		"express-handlebars": "^7.1.2",
 		"express-session": "1.17.3",
+		"fs": "^0.0.1-security",
 		"gulp": "^5.0.0",
 		"gulp-less": "^5.0.0",
 		"gulp-sass": "^5.1.0",
