@@ -53,6 +53,7 @@ app.use(express.static("resources"));
 
 
 const multer = require("multer");
+const mindee = require("mindee");
 
 
 const storage = multer.diskStorage({
@@ -68,6 +69,27 @@ const uploadStorage = multer({ storage: storage });
 
 app.post("/upload", uploadStorage.single("file"), (req, res) => {
   console.log(req.file)
+
+
+  const mindeeClient = new mindee.Client({ apiKey: process.env.API_KEY });
+
+  // Load a file from disk
+  const path = req.file.path;
+  const inputSource = mindeeClient.docFromPath(path);
+  
+  // Parse the file
+  const apiResponse = mindeeClient.parse(
+	mindee.product.ReceiptV5,
+	inputSource
+  );
+  
+  // Handle the response Promise
+  apiResponse.then((resp) => {
+	// print a string summary
+	console.log(resp.document.toString());
+  });
+
+
 return res.render("pages/home", {
 	user: req.session.user,
 	username: req.session.user.username,
