@@ -87,43 +87,46 @@ app.post("/upload", uploadStorage.single("file"), (req, res) => {
   apiResponse.then((resp) => {
 	// print a string summary
 	console.log(resp.document.toString());
-	var partsArray = resp.document.toString().split(':');
+	var supplier_name = "";
+	var purchase_subcategory = "";
+	var total_amount = "";
+	var reciept_parts = resp.document.toString().split(':');
 	for (var i = 0; i < partsArray.length; i++)
 	{
-		if (partsArray[i] == "Purchase Subcategory")
+		if (reciept_parts[i] == "Purchase Subcategory")
 		{
-			console.log(partsArray[i+1]);
-			const purchase_subcategory = partsArray[i+1];
+			console.log("Purchase subcategory:");
+			console.log(reciept_parts[i+1]);
+			purchase_subcategory = reciept_parts[i+1];
 		}
-		if (partsArray[i] == "Total Amount")
+		if (reciept_parts[i] == "Total Amount")
 		{
-			console.log(partsArray[i+1]);
-			const total_amount = partsArray[i+1];
+			console.log("Total Amount:");
+			console.log(reciept_parts[i+1]);
+			total_amount = reciept_parts[i+1];
 		}
-		if (partsArray[i] == "Supplier Name")
+		if (reciept_parts[i] == "Supplier Name")
 		{
-			console.log(partsArray[i+1]);
-			const supplier_name = partsArray[i+1];
+			console.log("Supplier name:");
+			console.log(reciept_parts[i+1]);
+			supplier_name = reciept_parts[i+1];
 			break;
 		}
 	}
-  });
 
-
-  if (members[i] !== req.session.user.username) {
 	db.tx(async t => {
-	await db.one("INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
-		[req.session.user.username, members[i], (total_amount / members.length), purchase_subcategory]).then((data) => {
+		await db.one("INSERT INTO reciept_transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
+		[req.session.user.username, supplier_name, total_amount, purchase_subcategory]).then((data) => {
 			console.log("Transaction data: ", data);
-			db.none("INSERT INTO user_to_transactions (username, transaction_id, is_sender) VALUES ($1, $2, $3)", [members[i], data.id, false])
+			db.none("INSERT INTO user_to_reciept_transactions (username, transaction_id) VALUES ($1, $2)", [req.session.user.username, data.id])
 		})
 		.catch((err) => {
 			console.error(err);
-			res.render("pages/home", { message: "An error occurred while adding group expense.", error: true });
+			res.render("pages/home", { message: "An error occurred while uploading your reciept data.", error: true });
 			return;
 		});
 	})
-}
+  })
 
 
 return res.render("pages/home", {
