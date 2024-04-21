@@ -235,7 +235,6 @@ app.get("/home", (req, res) => {
 				username: req.session.user.username,
 				balance: req.session.user.balance,
 				transactions: transactions,
-				balance: req.session.user.balance,
 			});
 		});
 
@@ -250,8 +249,6 @@ app.get("/home", (req, res) => {
 app.post("/deposit", async (req, res) => {
 
 	try {
-
-
 		console.log(req.body)
 		
 		let deposit = parseFloat(req.body.deposit_amount)
