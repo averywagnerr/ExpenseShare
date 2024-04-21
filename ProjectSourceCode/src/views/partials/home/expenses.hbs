@@ -1,22 +1,28 @@
+
 <div class = "box">
   <h2 class="black-text box-titles">Expenses</h2>
 
 <table>
   <thead>
     <tr>
-      <th>ID</th>
       <th>Amount</th>
+      <th>Person</th>
       <th>Date</th>
     </tr>
   </thead>
   <tbody>
-    {{#each transactions}}
-    <tr>
-      <td>{{ id }}</td>
-      <td>{{ amount }}</td>
-      <td>{{ date }}</td>
-    </tr>
-    {{/each}}
+	{{username}}
+	{{#each transactions}}
+		<tr>
+			{{#if (isEqual username receiver)}}
+				<td class="text-green-500 font-bold">+{{ amount }}</td>
+			{{else}}
+				<td class="text-red-500 font-bold">-{{ amount }}</td>
+			{{/if}}
+			<td>{{ sender }}</td>
+			<td>{{ date }}</td>
+		</tr>
+	{{/each}}
   </tbody>
   </table>
 </div>

@@ -20,6 +20,13 @@ const hbs = handlebars.create({
 	partialsDir: __dirname + "/views/partials",
 });
 
+Handlebars.registerHelper('isEqual', function(arg1, arg2, options) {
+	if (arg1 == arg2) {
+		return true;
+	}
+	return false;
+});
+
 // <!-- Section 3 : App Settings -->
 
 // Register `hbs` as our view engine using its bound `engine()` function.
@@ -143,27 +150,27 @@ app.post("/register", async (req, res) => {
 				port: 465,
 				secure: true,
 				auth: {
-				user: 'donotreply.expenseshare@gmail.com',
-				pass: process.env.PASS,
+					user: 'donotreply.expenseshare@gmail.com',
+					pass: process.env.PASS,
 				},
 			});
-			
+
 			var mailOptions = {
 				from: 'donotreply.expenseshare@gmail.com',
 				to: req.body.email,
 				subject: 'Welcome to ExpenseShare!',
 				html: '<h1>Welcome!</h1> <br> ' +
-				'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
-				'Explore the application and have fun! <br> <br>' +
-				'If its not financially responsible, account me out!! <br> ' +
-				'We are funny too :) <br> <br>'
+					'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
+					'Explore the application and have fun! <br> <br>' +
+					'If its not financially responsible, account me out!! <br> ' +
+					'We are funny too :) <br> <br>'
 			};
-			
-			transporter.sendMail(mailOptions, function(error, info){
+
+			transporter.sendMail(mailOptions, function(error, info) {
 				if (error) {
-				console.log(error);
+					console.log(error);
 				} else {
-				console.log('Email sent: ' + info.response);
+					console.log('Email sent: ' + info.response);
 				}
 			});
 
@@ -279,11 +286,11 @@ app.get("/home", (req, res) => {
 	if (req.session.user) {
 		// select from database all user transactions
 
-		const transactions = db.manyOrNone(
-			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-			"SELECT * FROM transactions",
-			req.session.user.id
+		db.manyOrNone(
+			"SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			[req.session.user.username]
 		).then((transactions) => {
+			// console.log(transactions);
 			res.render("pages/home", {
 				user: req.session.user,
 				username: req.session.user.username,
@@ -307,7 +314,7 @@ app.post("/deposit", async (req, res) => {
 
 
 		console.log(req.body)
-		
+
 		let deposit = parseFloat(req.body.deposit_amount)
 		let withdraw = parseFloat(req.body.withdraw_amount)
 
@@ -318,17 +325,17 @@ app.post("/deposit", async (req, res) => {
 		newBalance = parseFloat(newBalance)
 
 		const query = await db.none(`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`)//update user balance in database
-		
+
 		req.session.user.balance = newBalance
 
 		res.render("pages/home", {//rerender page
 			balance: newBalance
 		});
 
-	} catch(err) {
+	} catch (err) {
 
 		console.log(err)
-    	res.status(400).send()
+		res.status(400).send()
 
 	}
 
