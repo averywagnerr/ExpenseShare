@@ -27,9 +27,9 @@ Router.get("/createGroup", (req, res) => {
 /* ================ Create Group ================ */
 
 Router.post("/createGroup", async (req, res) => {
-
   // Randomly generate a 10-char group token.
-  const token = randomUUID();
+  // const token = randomUUID();
+  const token = new ShortUniqueId({ length: 10 });
 
   try {
     await db.tx(async (t) => {
@@ -38,30 +38,28 @@ Router.post("/createGroup", async (req, res) => {
         req.body.groupname
       );
 
+      console.log(`groupname: ${req.body.groupname}`);
+
       // Hash the joincode using bcrypt library
-      const hash = await bcrypt.hash(token, 10);
+      const hash = await bcrypt.hash(toString(token), 10);
 
       await t.none("INSERT INTO groups(token, groupname) VALUES ($1, $2);", [
         hash,
         req.body.groupname,
       ]);
-      // let groups = [req.session.user.groups];
-      // groups.append(group);
-      // req.session.save();
+     
       // res.send({ message: "Successfully created group!"})
       // Redirect to the home page with a success message
-      res.redirect(302,
+      res.redirect(
+        302,
         "/home?message=" + encodeURIComponent("Successfully created group!")
       );
     });
   } catch (e) {
     console.error(e);
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the group." });
-    res.render("pages/createGroup", {
-      message: "Internal server error while creating group. Please try again!",
-    });
+    res.status(e.status);
+    res.render("pages/createGroup", { message: err.message });
+
   }
 });
 
@@ -113,16 +111,19 @@ Router.post("/joinGroup", async (req, res) => {
       console.log(`Error: ${err.message}, ${err.status}`);
       throw err;
     }
-    await db.none('INSERT INTO user_to_groups (username, token) VALUES ($1, $2)', [req.session.user.username, group.token]);
+    await db.none(
+      "INSERT INTO user_to_groups (username, token) VALUES ($1, $2)",
+      [req.session.user.username, group.token]
+    );
     // let groups = [req.session.user.groups];
     // groups.append(group);
     // req.session.save();
-    res.redirect(302,"/home");
+    res.redirect(302, "/home");
     // res.send({message: "WOOOO"})
   }).catch((err) => {
     console.error(err);
     res.status(err.status);
-    res.render("pages/createGroup", { message: err.message });
+    res.render("pages/joinGroup", { message: err.message });
     // res.redirect("/login?error=" + encodeURIComponent(err.message));
   });
 });
