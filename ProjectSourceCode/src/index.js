@@ -395,17 +395,11 @@ app.get("/home", (req, res) => {
 	if (req.session.user) {
 		// select from database all user transactions
 
-		db.manyOrNone(
-			"SELECT * FROM transactions where sender = $1 or receiver = $1",
-			[req.session.user.username]
+		const transactions = db.manyOrNone(
+			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			"SELECT * FROM transactions",
+			req.session.user.id
 		).then((transactions) => {
-			console.log(transactions);
-			res.render("pages/home", {
-				user: req.session.user,
-				username: req.session.user.username,
-				balance: req.session.user.balance,
-				transactions: transactions,
-				balance: req.session.user.balance,
 			const reciept_transactions = db.manyOrNone(
 				// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
 				"SELECT * FROM reciept_transactions",
