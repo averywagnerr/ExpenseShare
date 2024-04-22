@@ -1,24 +1,26 @@
 // *****************************************************
 // <!-- Section 1 : Import Dependencies -->
 // *****************************************************
-const express = require('express'); // To build an application server or API
+const express = require("express"); // To build an application server or API
 const app = express();
-const handlebars = require('express-handlebars');
-const Handlebars = require('handlebars');
-const path = require('path');
-const bodyParser = require('body-parser');
-const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
-const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const handlebars = require("express-handlebars");
+const Handlebars = require("handlebars");
+const path = require("path");
+const bodyParser = require("body-parser");
+const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
+const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part C.
 
 //INFO: Connection to DB and initialize it with test data in initdata.js
-const { bcrypt, db } = require('./resources/js/initdata'); // Connect from postgres DB and initialize it with test data
+const { bcrypt, db } = require("./resources/js/initdata"); // Connect from postgres DB and initialize it with test data
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
-	extname: "hbs",
-	layoutsDir: __dirname + "/views/layouts",
-	partialsDir: __dirname + "/views/partials",
+  extname: "hbs",
+  layoutsDir: __dirname + "/views/layouts",
+  partialsDir: __dirname + "/views/partials",
 });
+
+const groupRoutes = require("./routes/group");
 
 // <!-- Section 3 : App Settings -->
 
@@ -31,17 +33,17 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
 app.use(
-	session({
-		secret: process.env.SESSION_SECRET,
-		saveUninitialized: false,
-		resave: false,
-	})
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
 );
 
 app.use(
-	bodyParser.urlencoded({
-		extended: true,
-	})
+  bodyParser.urlencoded({
+    extended: true,
+  })
 );
 
 app.use(express.static("resources"));
@@ -183,60 +185,61 @@ app.get('/db', (_, res) => {
 				userToGroups: data.userToGroups,
 			};
 
-			res.send(queries);
-		})
-		.catch((error) => {
-			console.log("ERROR:", error);
-		});
+      res.send(queries);
+    })
+    .catch((error) => {
+      console.log("ERROR:", error);
+    });
 });
 
 app.get("/welcome", (req, res) => {
-	res.json({ status: "success", message: "Welcome!" });
+  res.json({ status: "success", message: "Welcome!" });
 });
 
 app.get("/", (req, res) => {
-	res.render("pages/landing");
+  res.render("pages/landing");
 });
 
-/* ================ Register ================ */
+/* ================ User Register ================ */
 
 app.get("/register", (req, res) => {
-	let errorMessage = req.query.error;
-	let message = req.query.message;
-	res.render("pages/register", { message: errorMessage || message });
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+  res.render("pages/register", { message: errorMessage || message });
 });
 
 app.post("/register", async (req, res) => {
-	let passwordRegex = /^(?=.*d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-	if (!passwordRegex.test(req.body.password)) {
-		res.status(400);
-		res.render("pages/register", {
-			message:
-				"Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
-		});
-		return;
-		// res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
-		// return res
-		//   .status(400)
-		//   .send(
-		//     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
-		//   );
-	}
+  let passwordRegex = /^(?=.*d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  if (!passwordRegex.test(req.body.password)) {
+    res.status(400);
+    res.render("pages/register", {
+      message:
+        "Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
+    });
+    return;
 
-	try {
-		await db.tx(async (t) => {
-			const user = await t.oneOrNone(
-				`SELECT * FROM users WHERE users.username = $1`,
-				req.body.username
-			);
+    // res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
+    // return res
+    //   .status(400)
+    //   .send(
+    //     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
+    //   );
+  }
 
-			if (user) {
-				res.status(400);
-				res.render("pages/register", { message: "Username already exists!" });
-				return;
-				// return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
-				// throw new Error(`User ${req.body.username} already exists!`);
-			}
+  try {
+    await db.tx(async (t) => {
+      const user = await t.oneOrNone(
+        `SELECT * FROM users WHERE users.username = $1`,
+        req.body.username
+      );
+
+      if (user) {
+        res.status(400);
+        res.render("pages/register", { message: "Username already exists!" });
+        return;
+        // return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
+        // throw new Error(`User ${req.body.username} already exists!`);
+      }
 
 			// Hash the password using bcrypt library
 			const hash = await bcrypt.hash(req.body.password, 10);
@@ -280,63 +283,65 @@ app.post("/register", async (req, res) => {
 			});
 
 
-			// Redirect to the login page with a success message
-			res.redirect(
-				"/login?message=" + encodeURIComponent("Successfully registered!")
-			);
-			// return res.redirect(
-			//   200, "/login?message=" + encodeURIComponent("Successfully registered!")
-			// );
-		});
-	} catch (e) {
-		console.error(e);
-		res
-			.status(500)
-			.json({ error: "An error occurred while registering the user." });
-		res.render("pages/register", {
-			message: "Internal server error while registering. Please try again!",
-		});
-		// res.status(500).json({ error: "An error occurred while registering the user." });
-		// res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
-		// return res.status(400).send(e.message);
-		// res.status(500).json({ error: "An error occurred while registering the user." });
-	}
+      // Redirect to the login page with a success message
+      res.redirect(
+        "/login?message=" + encodeURIComponent("Successfully registered!")
+      );
+      // return res.redirect(
+      //   200, "/login?message=" + encodeURIComponent("Successfully registered!")
+      // );
+    });
+  } catch (e) {
+    console.error(e);
+    res
+      .status(500)
+      .json({ error: "An error occurred while registering the user." });
+    res.render("pages/register", {
+      message: "Internal server error while registering. Please try again!",
+    });
+    // res.status(500).json({ error: "An error occurred while registering the user." });
+    // res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
+    // return res.status(400).send(e.message);
+    // res.status(500).json({ error: "An error occurred while registering the user." });
+  }
 });
 
-/* ================ Login ================ */
+/* ================ User Login ================ */
 
 app.get("/login", (req, res) => {
-	let errorMessage = req.query.error;
-	let message = req.query.message;
-	res.render("pages/login", {
-		message: errorMessage || message,
-		error: errorMessage,
-	});
+  let errorMessage = req.query.error;
+  let message = req.query.message;
+  res.render("pages/login", {
+    message: errorMessage || message,
+    error: errorMessage,
+  });
 });
 
 app.post("/login", async (req, res) => {
-	db.tx(async (t) => {
-		// check if password from request matches with password in DB
-		const user = await t.oneOrNone(
-			`SELECT * FROM users WHERE users.username = $1`,
-			req.body.username
-		);
-		if (!user) {
-			// res.status(404);
-			// res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
-			// return;
-			// throw new Error(
-			//   `User ${req.body.username} not found in database.`
-			// ).status(404);
-			// var err = new Error(`User ${req.body.username} not found in database.`);
+  db.tx(async (t) => {
+    // check if password from request matches with password in DB
+    const user = await t.oneOrNone(
+      `SELECT * FROM users WHERE users.username = $1`,
+      req.body.username
+    );
+    if (!user) {
+      // res.status(404);
+      // res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
+      // return;
+      // throw new Error(
+      //   `User ${req.body.username} not found in database.`
+      // ).status(404);
+      // var err = new Error(`User ${req.body.username} not found in database.`);
 
-			res.status(404);
-			// err.status = 404;
-			// console.log(`Error: ${err.message}, ${err.status}`);
-			// throw err;
-			res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
-			return
-		}
+      res.status(404);
+      // err.status = 404;
+      // console.log(`Error: ${err.message}, ${err.status}`);
+      // throw err;
+      res.render("pages/login", {
+        message: `User ${req.body.username} not found in database.`,
+      });
+      return;
+    }
 
 		const match = await bcrypt.compare(req.body.password, user.password);
 		if (!match) {
@@ -359,6 +364,8 @@ app.post("/login", async (req, res) => {
 	});
 });
 
+// ***************************************************
+
 // Authentication Middleware.
 const auth = (req, res, next) => {
 	if (!req.session.user) {
@@ -369,6 +376,12 @@ const auth = (req, res, next) => {
 
 // Authentication Required
 app.use(auth);
+
+// *****************  Group Routes  ******************
+
+app.use(groupRoutes, auth);
+
+// *****************************************************
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
@@ -537,8 +550,8 @@ app.post("/groupexpense", async function(req, res) {
 });
 
 app.get("/logout", (req, res) => {
-	req.session.destroy();
-	res.render("pages/logout");
+  req.session.destroy();
+  res.render("pages/logout");
 });
 
 // *****************************************************
