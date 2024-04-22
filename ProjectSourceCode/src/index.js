@@ -15,9 +15,9 @@ const { bcrypt, db } = require("./resources/js/initdata"); // Connect from postg
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
-  extname: "hbs",
-  layoutsDir: __dirname + "/views/layouts",
-  partialsDir: __dirname + "/views/partials",
+	extname: "hbs",
+	layoutsDir: __dirname + "/views/layouts",
+	partialsDir: __dirname + "/views/partials",
 });
 
 const groupRoutes = require("./routes/group");
@@ -33,17 +33,17 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // initialize session variables
 // === Use to connect to external APIs (i.e. PayPal) ===
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-  })
+	session({
+		secret: process.env.SESSION_SECRET,
+		saveUninitialized: false,
+		resave: false,
+	})
 );
 
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
+	bodyParser.urlencoded({
+		extended: true,
+	})
 );
 
 app.use(express.static("resources"));
@@ -55,99 +55,95 @@ const mindee = require("mindee");
 
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/")
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname)
-  },
+	destination: (req, file, cb) => {
+		cb(null, "uploads/")
+	},
+	filename: (req, file, cb) => {
+		cb(null, file.originalname)
+	},
 });
 
 const uploadStorage = multer({ storage: storage });
 
 app.post("/upload", uploadStorage.single("file"), (req, res) => {
-  console.log(req.file)
+	console.log(req.file)
 
 
-  const mindeeClient = new mindee.Client({ apiKey: process.env.API_KEY});
+	const mindeeClient = new mindee.Client({ apiKey: process.env.API_KEY });
 
-  // Load a file from disk
-  const path = req.file.path;
-  const inputSource = mindeeClient.docFromPath(path);
-  
-  // Parse the file
-  const apiResponse = mindeeClient.parse(
-	mindee.product.ReceiptV5,
-	inputSource
-  );
-  
-  // Handle the response Promise
-  apiResponse.then((resp) => {
-	// print a string summary
-	console.log(resp.document.toString());
-	var supplier_name = "";
-	var purchase_subcategory = "";
-	var total_amount = "";
-	var reciept_parts = resp.document.toString().split(':');
-	for (var i = 0; i < reciept_parts.length; i++)
-	{
-		if (reciept_parts[i] == "Purchase Subcategory")
-		{
-			console.log("Purchase subcategory:");
-			console.log(reciept_parts[i+1]);
-			purchase_subcategory = reciept_parts[i+1];
+	// Load a file from disk
+	const path = req.file.path;
+	const inputSource = mindeeClient.docFromPath(path);
+
+	// Parse the file
+	const apiResponse = mindeeClient.parse(
+		mindee.product.ReceiptV5,
+		inputSource
+	);
+
+	// Handle the response Promise
+	apiResponse.then((resp) => {
+		// print a string summary
+		console.log(resp.document.toString());
+		var supplier_name = "";
+		var purchase_subcategory = "";
+		var total_amount = "";
+		var reciept_parts = resp.document.toString().split(':');
+		for (var i = 0; i < reciept_parts.length; i++) {
+			if (reciept_parts[i] == "Purchase Subcategory") {
+				console.log("Purchase subcategory:");
+				console.log(reciept_parts[i + 1]);
+				purchase_subcategory = reciept_parts[i + 1];
+			}
+			if (reciept_parts[i] == "Total Amount") {
+				console.log("Total Amount:");
+				console.log(reciept_parts[i + 1]);
+				total_amount = reciept_parts[i + 1];
+			}
+			if (reciept_parts[i] == "Supplier Name") {
+				console.log("Supplier name:");
+				console.log(reciept_parts[i + 1]);
+				supplier_name = reciept_parts[i + 1];
+				break;
+			}
 		}
-		if (reciept_parts[i] == "Total Amount")
-		{
-			console.log("Total Amount:");
-			console.log(reciept_parts[i+1]);
-			total_amount = reciept_parts[i+1];
+
+		const fs = require('fs');
+
+		try {
+			fs.unlinkSync(path);
+			console.log('File deleted!');
+		} catch (err) {
+			// Handle specific error if any
+			console.error(err.message);
 		}
-		if (reciept_parts[i] == "Supplier Name")
-		{
-			console.log("Supplier name:");
-			console.log(reciept_parts[i+1]);
-			supplier_name = reciept_parts[i+1];
-			break;
-		}
-	}
 
-	const fs = require('fs');
-
-	try {
-		fs.unlinkSync(path);
-		console.log('File deleted!');
-	  } catch (err) {
-		// Handle specific error if any
-		console.error(err.message);
-	  }
-
-	db.tx(async t => {
-		await db.one("INSERT INTO reciept_transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
-		[req.session.user.username, supplier_name, total_amount, purchase_subcategory]).then((data) => {
-			console.log("Transaction data: ", data);
-			db.none("INSERT INTO user_to_reciept_transactions (username, transaction_id) VALUES ($1, $2)", [req.session.user.username, data.id])
+		db.tx(async t => {
+			await db.one("INSERT INTO reciept_transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
+				[req.session.user.username, supplier_name, total_amount, purchase_subcategory]).then((data) => {
+					console.log("Transaction data: ", data);
+					db.none("INSERT INTO user_to_reciept_transactions (username, transaction_id) VALUES ($1, $2)", [req.session.user.username, data.id])
+				})
+				.catch((err) => {
+					console.error(err);
+					res.render("pages/home", { message: "An error occurred while uploading your reciept data.", error: true });
+					return;
+				});
 		})
-		.catch((err) => {
-			console.error(err);
-			res.render("pages/home", { message: "An error occurred while uploading your reciept data.", error: true });
-			return;
-		});
 	})
-  })
 
 
-  const reciept_transactions = db.manyOrNone(
-	// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-	"SELECT * FROM reciept_transactions",
-	req.session.user.id
+	const reciept_transactions = db.manyOrNone(
+		// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+		"SELECT * FROM reciept_transactions",
+		req.session.user.id
 	).then((reciept_transactions) => {
 		const transactions = db.manyOrNone(
 			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
 			"SELECT * FROM transactions",
 			req.session.user.id
-			).then((transactions) => {
-				res.render("pages/home", {
+		).then((transactions) => {
+			res.render("pages/home", {
 				user: req.session.user,
 				username: req.session.user.username,
 				reciept_transactions: reciept_transactions,
@@ -157,7 +153,7 @@ app.post("/upload", uploadStorage.single("file"), (req, res) => {
 		});
 	});
 
-return;
+	return;
 });
 
 
@@ -185,61 +181,61 @@ app.get('/db', (_, res) => {
 				userToGroups: data.userToGroups,
 			};
 
-      res.send(queries);
-    })
-    .catch((error) => {
-      console.log("ERROR:", error);
-    });
+			res.send(queries);
+		})
+		.catch((error) => {
+			console.log("ERROR:", error);
+		});
 });
 
 app.get("/welcome", (req, res) => {
-  res.json({ status: "success", message: "Welcome!" });
+	res.json({ status: "success", message: "Welcome!" });
 });
 
 app.get("/", (req, res) => {
-  res.render("pages/landing");
+	res.render("pages/landing");
 });
 
 /* ================ User Register ================ */
 
 app.get("/register", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/register", { message: errorMessage || message });
+	let errorMessage = req.query.error;
+	let message = req.query.message;
+	res.render("pages/register", { message: errorMessage || message });
 });
 
 app.post("/register", async (req, res) => {
-  let passwordRegex = /^(?=.*d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-  if (!passwordRegex.test(req.body.password)) {
-    res.status(400);
-    res.render("pages/register", {
-      message:
-        "Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
-    });
-    return;
+	let passwordRegex = /^(?=.*d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+	if (!passwordRegex.test(req.body.password)) {
+		res.status(400);
+		res.render("pages/register", {
+			message:
+				"Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
+		});
+		return;
 
-    // res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
-    // return res
-    //   .status(400)
-    //   .send(
-    //     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
-    //   );
-  }
+		// res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
+		// return res
+		//   .status(400)
+		//   .send(
+		//     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
+		//   );
+	}
 
-  try {
-    await db.tx(async (t) => {
-      const user = await t.oneOrNone(
-        `SELECT * FROM users WHERE users.username = $1`,
-        req.body.username
-      );
+	try {
+		await db.tx(async (t) => {
+			const user = await t.oneOrNone(
+				`SELECT * FROM users WHERE users.username = $1`,
+				req.body.username
+			);
 
-      if (user) {
-        res.status(400);
-        res.render("pages/register", { message: "Username already exists!" });
-        return;
-        // return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
-        // throw new Error(`User ${req.body.username} already exists!`);
-      }
+			if (user) {
+				res.status(400);
+				res.render("pages/register", { message: "Username already exists!" });
+				return;
+				// return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
+				// throw new Error(`User ${req.body.username} already exists!`);
+			}
 
 			// Hash the password using bcrypt library
 			const hash = await bcrypt.hash(req.body.password, 10);
@@ -258,90 +254,90 @@ app.post("/register", async (req, res) => {
 				port: 465,
 				secure: true,
 				auth: {
-				user: 'donotreply.expenseshare@gmail.com',
-				pass: process.env.PASS,
+					user: 'donotreply.expenseshare@gmail.com',
+					pass: process.env.PASS,
 				},
 			});
-			
+
 			var mailOptions = {
 				from: 'donotreply.expenseshare@gmail.com',
 				to: req.body.email,
 				subject: 'Welcome to ExpenseShare!',
 				html: '<h1>Welcome!</h1> <br> ' +
-				'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
-				'Explore the application and have fun! <br> <br>' +
-				'If its not financially responsible, account me out!! <br> ' +
-				'We are funny too :) <br> <br>'
+					'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
+					'Explore the application and have fun! <br> <br>' +
+					'If its not financially responsible, account me out!! <br> ' +
+					'We are funny too :) <br> <br>'
 			};
-			
-			transporter.sendMail(mailOptions, function(error, info){
+
+			transporter.sendMail(mailOptions, function(error, info) {
 				if (error) {
-				console.log(error);
+					console.log(error);
 				} else {
-				console.log('Email sent: ' + info.response);
+					console.log('Email sent: ' + info.response);
 				}
 			});
 
 
-      // Redirect to the login page with a success message
-      res.redirect(
-        "/login?message=" + encodeURIComponent("Successfully registered!")
-      );
-      // return res.redirect(
-      //   200, "/login?message=" + encodeURIComponent("Successfully registered!")
-      // );
-    });
-  } catch (e) {
-    console.error(e);
-    res
-      .status(500)
-      .json({ error: "An error occurred while registering the user." });
-    res.render("pages/register", {
-      message: "Internal server error while registering. Please try again!",
-    });
-    // res.status(500).json({ error: "An error occurred while registering the user." });
-    // res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
-    // return res.status(400).send(e.message);
-    // res.status(500).json({ error: "An error occurred while registering the user." });
-  }
+			// Redirect to the login page with a success message
+			res.redirect(
+				"/login?message=" + encodeURIComponent("Successfully registered!")
+			);
+			// return res.redirect(
+			//   200, "/login?message=" + encodeURIComponent("Successfully registered!")
+			// );
+		});
+	} catch (e) {
+		console.error(e);
+		res
+			.status(500)
+			.json({ error: "An error occurred while registering the user." });
+		res.render("pages/register", {
+			message: "Internal server error while registering. Please try again!",
+		});
+		// res.status(500).json({ error: "An error occurred while registering the user." });
+		// res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
+		// return res.status(400).send(e.message);
+		// res.status(500).json({ error: "An error occurred while registering the user." });
+	}
 });
 
 /* ================ User Login ================ */
 
 app.get("/login", (req, res) => {
-  let errorMessage = req.query.error;
-  let message = req.query.message;
-  res.render("pages/login", {
-    message: errorMessage || message,
-    error: errorMessage,
-  });
+	let errorMessage = req.query.error;
+	let message = req.query.message;
+	res.render("pages/login", {
+		message: errorMessage || message,
+		error: errorMessage,
+	});
 });
 
 app.post("/login", async (req, res) => {
-  db.tx(async (t) => {
-    // check if password from request matches with password in DB
-    const user = await t.oneOrNone(
-      `SELECT * FROM users WHERE users.username = $1`,
-      req.body.username
-    );
-    if (!user) {
-      // res.status(404);
-      // res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
-      // return;
-      // throw new Error(
-      //   `User ${req.body.username} not found in database.`
-      // ).status(404);
-      // var err = new Error(`User ${req.body.username} not found in database.`);
+	db.tx(async (t) => {
+		// check if password from request matches with password in DB
+		const user = await t.oneOrNone(
+			`SELECT * FROM users WHERE users.username = $1`,
+			req.body.username
+		);
+		if (!user) {
+			// res.status(404);
+			// res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
+			// return;
+			// throw new Error(
+			//   `User ${req.body.username} not found in database.`
+			// ).status(404);
+			// var err = new Error(`User ${req.body.username} not found in database.`);
 
-      res.status(404);
-      // err.status = 404;
-      // console.log(`Error: ${err.message}, ${err.status}`);
-      // throw err;
-      res.render("pages/login", {
-        message: `User ${req.body.username} not found in database.`,
-      });
-      return;
-    }
+			res.status(404);
+			// err.status = 404;
+			// console.log(`Error: ${err.message}, ${err.status}`);
+			// throw err;
+			res.render("pages/login", {
+				message: `User ${req.body.username} not found in database.`,
+			});
+			return;
+		}
 
 		const match = await bcrypt.compare(req.body.password, user.password);
 		if (!match) {
@@ -422,7 +418,7 @@ app.post("/deposit", async (req, res) => {
 
 
 		console.log(req.body)
-		
+
 		let deposit = parseFloat(req.body.deposit_amount)
 		let withdraw = parseFloat(req.body.withdraw_amount)
 
@@ -433,7 +429,7 @@ app.post("/deposit", async (req, res) => {
 		newBalance = parseFloat(newBalance)
 
 		const query = await db.none(`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`)//update user balance in database
-		
+
 		req.session.user.balance = newBalance
 
 		const transactions = db.manyOrNone(
@@ -456,45 +452,14 @@ app.post("/deposit", async (req, res) => {
 			});
 		});
 
-	} catch(err) {
+	} catch (err) {
 
 		console.log(err)
-    	res.status(400).send()
+		res.status(400).send()
 
 	}
 
 })
-
-app.post("/joingroup", async function(req, res) {
-	// First check if the group exists
-	let exists = false;
-	await db.oneOrNone("SELECT * FROM groups WHERE groupname = $1", req.body.groupname)
-		.then((group) => {
-			if (group) {
-				exists = true;
-			}
-		})
-		.catch((err) => {
-			console.error(err);
-			res.render("pages/home", { message: "An error occurred while joining the group.", error: true });
-			return;
-		});
-
-	// If it exists, add the user to the group
-	if (!exists) {
-		db.none("INSERT INTO groups (groupname) VALUES ($1)", req.body.groupname)
-	} else {
-		db.none("INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)",
-			[req.session.user.username, req.body.groupname]).catch((_) => {
-				res.redirect("pages/home", { message: encodeURIComponent("Unsuccessfully joined group.") });
-				return;
-			});
-	}
-	//
-	// // Redirect to the home page with a success message
-	res.render("pages/home", { message: "Successfully joined group." });
-});
-
 
 app.post("/groupexpense", async function(req, res) {
 	//INFO: Make sure the sender is in the group
@@ -550,8 +515,8 @@ app.post("/groupexpense", async function(req, res) {
 });
 
 app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.render("pages/logout");
+	req.session.destroy();
+	res.render("pages/logout");
 });
 
 // *****************************************************
