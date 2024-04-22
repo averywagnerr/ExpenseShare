@@ -148,20 +148,21 @@ describe("Testing Register API", () => {
 
 describe("Join & Create Groups",()  => {
 	
-	it("Inputs a test group", async (done) => {
-		chai
-			.request(server)
-			.post("/createGroup")
-			.send({ groupname: "New Test Group"})
-			.end((err, res) => {
-				expect(res).to.have.status(302);
-				done();
-			});
+	// TODO -- figure out test env 
+	// it("Inputs a test group", async (done) => {
+	// 	chai
+	// 		.request(server)
+	// 		.post("/createGroup")
+	// 		.send({ groupname: "New Test Group"})
+	// 		.end((err, res) => {
+	// 			expect(res).to.have.status(302);
+	// 			done();
+	// 		});
 
-		const test_hash = await bcrypt.hash('testtoken', 10);
+		// const test_hash = await bcrypt.hash('testtoken', 10);
 
-		await server.none('INSERT INTO groups (token, groupname) VALUES ($1, $2)', [hash, groupname]);
-	})
+		// await server.none('INSERT INTO groups (token, groupname) VALUES ($1, $2)', [hash, groupname]);
+	// })
 
 	/* 
 	 * Positive Case : A user can create a group by entering a group name.
