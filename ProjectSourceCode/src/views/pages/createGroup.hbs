@@ -1,0 +1,67 @@
+{{> message}}
+
+<style>
+    .grid {
+        
+        {{!-- width:600px; --}}
+        display: grid;
+        row-gap: 20px;
+        column-gap: 20px;
+        grid-template-columns: 33% 33% 33%;
+
+        {{!-- padding-left:auto;
+        padding-right:auto; --}}
+        text-align:center;
+        font-size:30px;
+    }
+    form{
+        grid-column-start: 2;
+        grid-column-end: 3;
+        border: 5px;
+        border-style:solid;
+        border-color:#212529;
+        padding-left: 50px;
+        padding-right: 50px;
+        background-color: #dcdcdc;
+    }
+    .secondRow {
+        grid-row-start:2;
+        grid-column-start: 2;
+        grid-column-end: 2;
+    }
+    button {
+        color: #212529;
+        background-color:#92ffcd;
+    }
+</style>
+
+<style>
+
+</style>
+
+<h1>Create a Group</h1>
+
+<div class="grid">
+{{!-- <form method="post" action="/login"> --}}
+<form method="post" action="/createGroup">
+    <p>&nbsp;</p>
+    <label for="groupname">Group Name</label>
+    <input type="text" name="groupname"/><br />
+    <p>&nbsp;</p>
+    {{!-- TODO: invite functionality ? --}}
+    <label for="invite">Invite People</label> 
+    <input type="text" name="invite"/><br />
+    <p>&nbsp;</p>
+    <button id="submit_button" type="submit">
+        Create
+    </button>
+    <p>&nbsp;</p>
+</form>
+
+    <p class="secondRow">
+        <br> Or, 
+        <a href="./joinGroup">Join an Existing Group</a>
+    </p>
+
+</div>
+<p style="padding-bottom:50px">&nbsp;</p>

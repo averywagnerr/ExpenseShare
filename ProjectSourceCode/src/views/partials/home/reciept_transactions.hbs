@@ -1,0 +1,26 @@
+<div class = "box">
+  <h2 class="black-text box-titles">Reciept Transactions:</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Sender</th>
+      <th>Reciever</th>
+      <th>Amount</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each reciept_transactions}}
+    <tr>
+      <td>{{ id }}</td>
+      <td>{{ sender }}</td>
+      <td>{{ receiver }}</td>
+      <td>{{ amount }}</td>
+      <td>{{ description }}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+  </table>
+</div>

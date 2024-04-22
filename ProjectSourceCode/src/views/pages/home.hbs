@@ -1,8 +1,8 @@
 <header>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bootstrap</title>
-    <link
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> --}}
+    {{!-- <title>Bootstrap</title> --}}
+    {{!-- <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
@@ -19,7 +19,10 @@
         <link rel="stylesheet" href="../../resources/css/tailwind.css">
     </div>
 
-      <div class="navbar-collapse collapse order-3 dual-collapse2">
+
+    
+  
+      {{!-- <div class="navbar-collapse collapse order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
             <a class="nav-item">
                 <a class="nav-link black-text">
@@ -28,8 +31,8 @@
             </a>
         </ul>
       </div>
-    </nav>
-  </header>
+    </nav> --}}
+  {{!-- </head> --}}
 
 <form>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
@@ -70,7 +73,7 @@
         <input type="number" name="share-amount" id="share-amount" /><br/>
     </form>
 
-    <button id="calculate_button" type="submit" class="black-text" onclick="myFunction()">
+    <button id="calculate_button" type="submit" class="black-text" onclick="automatic_calc()">
         Calculate
     </button>
     <div id="calculate_button_result">
@@ -79,7 +82,7 @@
     </div>
 
     <script>
-      function myFunction() {
+      function automatic_calc() {
         const expense = document.getElementById('expense-amount').value;
         const percent = document.getElementById('share-amount').value;
         const percent_new = percent/100;
@@ -90,6 +93,20 @@
     </script>
 </div>
 <br>
+
+<div class = "box">
+  Submit a photo of your reciept and add this transaction to your reciepts transactions! <br>
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="reciept_form">
+        <label class="black-text" for="file">Submit your reciept:</label> <br>
+        <input type="file" name="file" id="file"/><br/>
+        <button type="submit" class="black-text" >
+          Submit
+        </button>
+    </form>
+</div>
+<br>
+
+{{> home/reciept_transactions reciept_transactions = reciept_transactions}}
 
 <div Resume id="resume" class = "box">
 
@@ -125,5 +142,3 @@
 {{> home/grouppay }}
 
 {{> home/expenses transactions=transactions}}
-
-{{> home/joingroup }}
