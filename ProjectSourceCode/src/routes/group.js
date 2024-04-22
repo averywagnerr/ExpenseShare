@@ -24,7 +24,7 @@ Router.get("/createGroup", (req, res) => {
   res.render("pages/createGroup", { message: errorMessage || message });
 });
 
-/* ================ Create Group ================ */
+// * ================ Create Group ================ * //
 
 Router.post("/createGroup", async (req, res) => {
   // Randomly generate a 10-char group token.
@@ -62,7 +62,7 @@ Router.post("/createGroup", async (req, res) => {
   }
 });
 
-/* ================ Join Group ================ */
+// * ================ Join Group ================ * //
 
 Router.get("/joinGroup", (req, res) => {
   // if (!req.session.user) {
