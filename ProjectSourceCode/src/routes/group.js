@@ -10,6 +10,48 @@ const Router = express.Router();
 
 // let Group = require('../models/group');
 
+const getGroups = async (req, res) => {
+  const members = [];
+  const groups = [];
+
+  await db
+    .manyOrNone(
+      "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
+      req.body.groupname
+    )
+    //   .manyOrNone(
+    //   "SELECT username FROM user_to_groups WHERE groupname = $1",
+    //   req.body.groupname
+    // )
+    .then((users) => {
+      users.forEach((user) => {
+        console.log("User: ", user);
+        members.push(user.username);
+      });
+    });
+
+  await db
+    .manyOrNone(
+      "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.username = $1",
+      // "SELECT (groupname, token) FROM user_to_groups WHERE username = $1",
+      req.session.user.username
+    )
+    .then((groups_res) => {
+      groups_res.forEach((group) => {
+        console.log("Group: ", group);
+        const group_model = {
+          groupname: group.groupname,
+          token: group.token, // TODO : decrypt
+          members: members,
+        };
+
+        groups.push(group_model);
+      });
+    });
+
+  return groups;
+};
+
 Router.get("/joinGroup", (req, res) => {
   let errorMessage = req.query.error;
   let message = req.query.message;
@@ -47,18 +89,27 @@ Router.post("/createGroup", async (req, res) => {
         hash,
         req.body.groupname,
       ]);
-     
+
+      const groups = getGroups(req);
+      res.redirect(302, "/home");
+      res
+        .render("pages/home", {
+          message: `Successfully created group!`,
+          user: req.session.user,
+          username: req.session.user.username,
+          groups: groups,
+        })
+        .send();
+
+
       // res.send({ message: "Successfully created group!"})
       // Redirect to the home page with a success message
-      res.render(
-        "/home", { message: "Successfully created group!" }
-      );
+      // res.render("pages/home", { message: "Successfully created group!" });
     });
   } catch (e) {
     console.error(e);
     res.status(e.status);
     res.render("pages/createGroup", { message: e.message });
-
   }
 });
 
@@ -89,6 +140,7 @@ Router.post("/joinGroup", async (req, res) => {
 
   db.tx(async (t) => {
     // Check if name from request matches with name in DB
+
     const group = await t.oneOrNone(
       `SELECT * FROM groups WHERE groups.groupname = $1`,
       req.body.groupname
@@ -105,32 +157,50 @@ Router.post("/joinGroup", async (req, res) => {
     const match = await bcrypt.compare(req.body.token, group.token);
 
     if (!match) {
-       res.status(400);
-       res.render("pages/joinGroup", {
+      res.status(400);
+      res.render("pages/joinGroup", {
         error: `The join code entered is incorrect.`,
       });
       return;
-      // var err = new Error(`The join code entered is incorrect.`);
-      // err.status = 400;
-      // console.log(`Error: ${err.message}, ${err.status}`);
-      // throw err;
     }
-    await t.none(
-      "INSERT INTO user_to_groups (username, token) VALUES ($1, $2)",
-      [req.session.user.username, group.token]
+
+    // first check that user is not already in group
+    const check = await t.oneOrNone(
+      "SELECT * FROM user_to_groups WHERE username = $1 AND groupname = $2",
+      [req.session.user.username, req.body.groupname]
     );
-    // let groups = [req.session.user.groups];
-    // groups.append(group);
-    // req.session.save();
-    // res.redirect(302, "/home");
-    // res.send({message: "WOOOO"})
+    if (check) {
+      res.status(400);
+      res.render("pages/joinGroup", {
+        error: `You are already a member of this group.`,
+      });
+      return;
+    }
+
+    await t.none(
+      "INSERT INTO user_to_groups (username, token, groupname) VALUES ($1, $2, $3)",
+      [req.session.user.username, group.token, req.body.groupname]
+    );
+    // let groups = [];
+    const groups = getGroups(req);
+
+    res.redirect(302, "/home");
+    res
+      .render("pages/home", {
+        message: `Succesfully joined ${req.body.groupname}!`,
+        user: req.session.user,
+        username: req.session.user.username,
+        groups: groups,
+      })
+      .send();
   }).catch((err) => {
     console.error(err);
     // res.status(err.status);
     // res.render("pages/joinGroup", { message: err.message });
     console.error(err);
-    res.status(500).render("pages/joinGroup", { 
-      message: "An error occurred while joining the group. Please try again later."
+    res.status(500).render("pages/joinGroup", {
+      message:
+        "An error occurred while joining the group. Please try again later.",
     });
     // res.redirect("/login?error=" + encodeURIComponent(err.message));
   });

@@ -1,0 +1,29 @@
+<div class = "box container w-50 px-4">
+  <h2 class="h4  black-text box-titles">Groups</h2>
+
+<table class=" max-w-full">
+  <thead>
+    <tr>
+				<th>Name</th>
+				<th>Members</th>
+    </tr>
+  </thead>
+  <tbody >
+    {{#each groups}}
+    <tr class="flex p-6 py-8 border-b border-black ">
+
+      <td>
+			  {{groupname}}
+      </td>
+      <td>{{members}}</td>
+      {{/each}}
+
+    </tr>
+    <tr>
+      <td>Test</td>
+      <td>Me</td>
+    </tr>
+      
+  </tbody>
+  </table>
+</div>
