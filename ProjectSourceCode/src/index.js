@@ -256,16 +256,15 @@ app.get("/home", (req, res) => {
 	if (req.session.user) {
 		// select from database all user transactions
 
-		const transactions = db
+		db
 			.manyOrNone(
-				// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-				"SELECT * FROM transactions",
-				req.session.user.id
+				"SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+				[req.session.user.username]
 			)
 			.then((transactions) => {
+				console.log(transactions);
 				const reciept_transactions = db
 					.manyOrNone(
-						// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
 						"SELECT * FROM reciept_transactions",
 						req.session.user.id
 					)
