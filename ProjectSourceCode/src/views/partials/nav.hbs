@@ -1,52 +1,41 @@
 <header>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
-    <div class="container-fluid  pb-2 mx-4 pt-2">
-    {{!-- <div class="navbar-collapse collapse  container-fluid  w-100 order-0 order-md-0 dual-collapse2 pb-2 mx-4 pt-2"> --}}
-    <a class="navbar-brand mb-0 h1" href="/">
-      <img src="/img/text-logo-2.png" alt="" width="250" class="">
-       {{!-- <img src=".././resources/img/block-logo-1.wesbp" alt="" width="30" class="d-inline-block align-text-top"> --}}
-      {{!-- ExpenseShare --}}
-    </a>
-      <ul class="navbar-nav mr-auto ">
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid pb-2 mx-4 pt-2 flex justify-between">
+      <a class="navbar-brand mb-0 h1" href="/">
+        <img src="/img/text-logo-2.png" alt="" width="250">
+      </a>
+      <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" href="{{#if username}}/home{{else}}/"{{/if}}>Home</a>
+          <a class="nav-link" href="{{#if username}}/home{{else}}/"{{/if}}>Home</a>
         </li>
         {{#if username}}
         <li class="nav-item">
-            <a class="nav-link" href="/joinGroup">Join a Group</a>
+          <a class="nav-link" href="/joinGroup">Join a Group</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/createGroup">Create a Group</a>
+          <a class="nav-link" href="/createGroup">Create a Group</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
+          <a class="nav-link" href="/logout">Logout</a>
         </li>
         <li class="nav-item">
-              <a class="nav-link" href="#">
-              Hi, {{ username }}!
-              </a>
-          </li>
-          
+          <a class="nav-link" href="#">Hi, {{ username }}!</a>
+        </li>
         {{else}}
-         <li class="nav-item">
-            <a class="nav-link" href="/login">Login</a>
+        <li class="nav-item">
+          <a class="nav-link" href="/login">Login</a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-primary mx-2" href="/register">Register</a>
+          <a class="btn btn-primary mx-2" href="/register">Register</a>
         </li>
         {{/if}}
-
-      <li class="nav-item">
-            <a class="navbar-brand " href="/">
-              <img src="/img/block-logo-1.svg" alt="" width="40" class="">
-            </a>
-      </li >
-    </ul>
-     
-      {{!-- <a class="navbar-brand mb-0 h1" href="/">
-              <img src="/img/block-logo-1.svg" alt="" width="40" class="">
-            </a> --}}
-
+        <li class="nav-item">
+          <a class="navbar-brand" href="/">
+            <img src="/img/block-logo-1.svg" alt="" width="40">
+          </a>
+        </li>
+      </ul>
     </div>
   </nav>
 </header>
