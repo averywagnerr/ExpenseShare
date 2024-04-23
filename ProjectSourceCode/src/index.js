@@ -8,7 +8,6 @@ const Handlebars = require("handlebars");
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
-const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part C.
 
 
 // INFO: Connection to DB and initialize it with test data in initdata.js
@@ -24,7 +23,7 @@ const hbs = handlebars.create({
 	partialsDir: __dirname + "/views/partials",
 });
 
-Handlebars.registerHelper('isEqual', function(arg1, arg2, options) {
+Handlebars.registerHelper('isEqual', function(arg1, arg2,) {
 	if (arg1 == arg2) {
 		return true;
 	}
