@@ -382,6 +382,8 @@ app.post("/groupexpense", async function(req, res) {
 			return;
 		});
 
+	console.log("GROUP MEMBERS: ", members);
+
 	for (let i = 0; i < members.length; i++) {
 		if (members[i] !== req.session.user.username) {
 			await db.one("INSERT INTO transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
