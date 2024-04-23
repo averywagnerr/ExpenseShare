@@ -4,19 +4,24 @@
 <table>
   <thead>
     <tr>
-      <th>ID</th>
       <th>Amount</th>
+      <th>To/From</th>
       <th>Date</th>
     </tr>
   </thead>
   <tbody>
-    {{#each transactions}}
-    <tr>
-      <td>{{ id }}</td>
-      <td>{{ amount }}</td>
-      <td>{{ date }}</td>
-    </tr>
-    {{/each}}
+	{{#each transactions}}
+		<tr>
+			{{#if (isEqual ../username receiver)}}
+				<td class="text-green-500 font-bold">+{{ amount }}</td>
+				<td>{{ sender }}</td>
+			{{else}}
+				<td class="text-red-500 font-bold">-{{ amount }}</td>
+				<td>{{ receiver }}</td>
+			{{/if}}
+			<td>{{ formatDate date }}</td>
+		</tr>
+	{{/each}}
   </tbody>
   </table>
 </div>
