@@ -10,8 +10,12 @@ const bodyParser = require("body-parser");
 const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part C.
 
-//INFO: Connection to DB and initialize it with test data in initdata.js
+
+// INFO: Connection to DB and initialize it with test data in initdata.js
 const { bcrypt, db } = require("./resources/js/initdata"); // Connect from postgres DB and initialize it with test data
+const uploadRoutes = require("./routes/uploads");
+const groupRoutes = require("./routes/group");
+const transactionRoutes = require("./routes/transactions");
 
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
@@ -32,7 +36,6 @@ Handlebars.registerHelper('formatDate', function(datetime) {
 	const options = { month: 'short', day: 'numeric', year: 'numeric' };
 	return date.toLocaleDateString('en-US', options);
 });
-const groupRoutes = require("./routes/group");
 
 // <!-- Section 3 : App Settings -->
 
@@ -43,7 +46,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
 // initialize session variables
-// === Use to connect to external APIs (i.e. PayPal) ===
 app.use(
 	session({
 		secret: process.env.SESSION_SECRET,
@@ -59,133 +61,25 @@ app.use(
 );
 
 app.use(express.static("resources"));
+app.use(uploadRoutes);
 
 
-
-const multer = require("multer");
-const mindee = require("mindee");
-
-
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, "uploads/")
-	},
-	filename: (req, file, cb) => {
-		cb(null, file.originalname)
-	},
-});
-
-const uploadStorage = multer({ storage: storage });
-
-app.post("/upload", uploadStorage.single("file"), (req, res) => {
-	console.log(req.file)
-
-
-	const mindeeClient = new mindee.Client({ apiKey: process.env.API_KEY });
-
-	// Load a file from disk
-	const path = req.file.path;
-	const inputSource = mindeeClient.docFromPath(path);
-
-	// Parse the file
-	const apiResponse = mindeeClient.parse(
-		mindee.product.ReceiptV5,
-		inputSource
-	);
-
-	// Handle the response Promise
-	apiResponse.then((resp) => {
-		// print a string summary
-		console.log(resp.document.toString());
-		var supplier_name = "";
-		var purchase_subcategory = "";
-		var total_amount = "";
-		var reciept_parts = resp.document.toString().split(':');
-		for (var i = 0; i < reciept_parts.length; i++) {
-			if (reciept_parts[i] == "Purchase Subcategory") {
-				console.log("Purchase subcategory:");
-				console.log(reciept_parts[i + 1]);
-				purchase_subcategory = reciept_parts[i + 1];
-			}
-			if (reciept_parts[i] == "Total Amount") {
-				console.log("Total Amount:");
-				console.log(reciept_parts[i + 1]);
-				total_amount = reciept_parts[i + 1];
-			}
-			if (reciept_parts[i] == "Supplier Name") {
-				console.log("Supplier name:");
-				console.log(reciept_parts[i + 1]);
-				supplier_name = reciept_parts[i + 1];
-				break;
-			}
-		}
-
-		const fs = require('fs');
-
-		try {
-			fs.unlinkSync(path);
-			console.log('File deleted!');
-		} catch (err) {
-			// Handle specific error if any
-			console.error(err.message);
-		}
-
-		db.tx(async t => {
-			await db.one("INSERT INTO reciept_transactions (sender, receiver, amount, description) VALUES ($1, $2, $3, $4) RETURNING id",
-				[req.session.user.username, supplier_name, total_amount, purchase_subcategory]).then((data) => {
-					console.log("Transaction data: ", data);
-					db.none("INSERT INTO user_to_reciept_transactions (username, transaction_id) VALUES ($1, $2)", [req.session.user.username, data.id])
-				})
-				.catch((err) => {
-					console.error(err);
-					res.render("pages/home", { message: "An error occurred while uploading your reciept data.", error: true });
-					return;
-				});
-		})
-	})
-
-
-	const reciept_transactions = db.manyOrNone(
-		// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-		"SELECT * FROM reciept_transactions",
-		req.session.user.id
-	).then((reciept_transactions) => {
-		const transactions = db.manyOrNone(
-			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-			"SELECT * FROM transactions",
-			req.session.user.id
-		).then((transactions) => {
-			res.render("pages/home", {
-				user: req.session.user,
-				username: req.session.user.username,
-				reciept_transactions: reciept_transactions,
-				transactions: transactions,
-				balance: req.session.user.balance,
-			});
-		});
-	});
-
-	return;
-});
-
-
-
-// *****************************************************
+// ***************************************************
 // <!-- Section 4 : API Routes -->
-// *****************************************************
+//***************************************************
 
 // TODO - Include your API routes here
-app.get('/db', (_, res) => {
-	query = 'SELECT * FROM users'
-	db.tx(async t => {
-		const users = await t.manyOrNone('SELECT * FROM users');
-		const groups = await t.manyOrNone('SELECT * FROM groups');
-		const transactions = await t.manyOrNone('SELECT * FROM transactions');
-		const userToGroups = await t.manyOrNone('SELECT * FROM user_to_groups');
+app.get("/db", (_, res) => {
+	query = "SELECT * FROM users";
+	db.tx(async (t) => {
+		const users = await t.manyOrNone("SELECT * FROM users");
+		const groups = await t.manyOrNone("SELECT * FROM groups");
+		const transactions = await t.manyOrNone("SELECT * FROM transactions");
+		const userToGroups = await t.manyOrNone("SELECT * FROM user_to_groups");
 
 		return { users, groups, transactions, userToGroups };
 	})
-		.then(data => {
+		.then((data) => {
 			queries = {
 				users: data.users,
 				groups: data.groups,
@@ -208,7 +102,7 @@ app.get("/", (req, res) => {
 	res.render("pages/landing");
 });
 
-/* ================ User Register ================ */
+// * ================ User Register ================ * //
 
 app.get("/register", (req, res) => {
 	let errorMessage = req.query.error;
@@ -225,13 +119,6 @@ app.post("/register", async (req, res) => {
 				"Invalid password. Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long.",
 		});
 		return;
-
-		// res.redirect(400, "/register?error=" + encodeURIComponent(e.message));
-		// return res
-		//   .status(400)
-		//   .send(
-		//     "Password must contain at least one digit, one lowercase letter, one uppercase letter, and be at least 8 characters long."
-		//   );
 	}
 
 	try {
@@ -245,59 +132,52 @@ app.post("/register", async (req, res) => {
 				res.status(400);
 				res.render("pages/register", { message: "Username already exists!" });
 				return;
-				// return res.redirect(400, "/register?error=" + encodeURIComponent(`User ${req.body.username} already exists!`));
-				// throw new Error(`User ${req.body.username} already exists!`);
 			}
 
 			// Hash the password using bcrypt library
 			const hash = await bcrypt.hash(req.body.password, 10);
-			await t.none("INSERT INTO users(username, password, email) VALUES ($1, $2, $3);", [
-				req.body.username,
-				hash,
-				req.body.email,
-			]);
+			await t.none(
+				"INSERT INTO users(username, password, email) VALUES ($1, $2, $3);",
+				[req.body.username, hash, req.body.email]
+			);
 
-
-			var nodemailer = require('nodemailer');
+			var nodemailer = require("nodemailer");
 
 			const transporter = nodemailer.createTransport({
-				service: 'gmail',
-				host: 'smtp.gmail.com',
+				service: "gmail",
+				host: "smtp.gmail.com",
 				port: 465,
 				secure: true,
 				auth: {
-					user: 'donotreply.expenseshare@gmail.com',
+					user: "donotreply.expenseshare@gmail.com",
 					pass: process.env.PASS,
 				},
 			});
 
 			var mailOptions = {
-				from: 'donotreply.expenseshare@gmail.com',
+				from: "donotreply.expenseshare@gmail.com",
 				to: req.body.email,
-				subject: 'Welcome to ExpenseShare!',
-				html: '<h1>Welcome!</h1> <br> ' +
-					'We are happy you have signed up for our application. We strive to make all of our customers happy. <br>' +
-					'Explore the application and have fun! <br> <br>' +
-					'If its not financially responsible, account me out!! <br> ' +
-					'We are funny too :) <br> <br>'
+				subject: "Welcome to ExpenseShare!",
+				html:
+					"<h1>Welcome!</h1> <br> " +
+					"We are happy you have signed up for our application. We strive to make all of our customers happy. <br>" +
+					"Explore the application and have fun! <br> <br>" +
+					"If its not financially responsible, account me out!! <br> " +
+					"We are funny too :) <br> <br>",
 			};
 
 			transporter.sendMail(mailOptions, function(error, info) {
 				if (error) {
 					console.log(error);
 				} else {
-					console.log('Email sent: ' + info.response);
+					console.log("Email sent: " + info.response);
 				}
 			});
-
 
 			// Redirect to the login page with a success message
 			res.redirect(
 				"/login?message=" + encodeURIComponent("Successfully registered!")
 			);
-			// return res.redirect(
-			//   200, "/login?message=" + encodeURIComponent("Successfully registered!")
-			// );
 		});
 	} catch (e) {
 		console.error(e);
@@ -307,14 +187,10 @@ app.post("/register", async (req, res) => {
 		res.render("pages/register", {
 			message: "Internal server error while registering. Please try again!",
 		});
-		// res.status(500).json({ error: "An error occurred while registering the user." });
-		// res.redirect(500, "/register?error=" + encodeURIComponent(e.message));
-		// return res.status(400).send(e.message);
-		// res.status(500).json({ error: "An error occurred while registering the user." });
 	}
 });
 
-/* ================ User Login ================ */
+// * ================ User Login ================ * //
 
 app.get("/login", (req, res) => {
 	let errorMessage = req.query.error;
@@ -333,18 +209,7 @@ app.post("/login", async (req, res) => {
 			req.body.username
 		);
 		if (!user) {
-			// res.status(404);
-			// res.render("pages/login", { message: `User ${req.body.username} not found in database.` });
-			// return;
-			// throw new Error(
-			//   `User ${req.body.username} not found in database.`
-			// ).status(404);
-			// var err = new Error(`User ${req.body.username} not found in database.`);
-
 			res.status(404);
-			// err.status = 404;
-			// console.log(`Error: ${err.message}, ${err.status}`);
-			// throw err;
 			res.render("pages/login", {
 				message: `User ${req.body.username} not found in database.`,
 			});
@@ -353,8 +218,6 @@ app.post("/login", async (req, res) => {
 
 		const match = await bcrypt.compare(req.body.password, user.password);
 		if (!match) {
-			// res.status(400);
-			// throw new Error(`The password entered is incorrect.`).status(400);
 			var err = new Error(`The password entered is incorrect.`);
 			err.status = 400;
 			console.log(`Error: ${err.message}, ${err.status}`);
@@ -368,11 +231,10 @@ app.post("/login", async (req, res) => {
 		console.error(err);
 		res.status(err.status);
 		res.render("pages/login", { message: err.message });
-		// res.redirect("/login?error=" + encodeURIComponent(err.message));
 	});
 });
 
-// ***************************************************
+// * ================ Auth ================ * //
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
@@ -382,42 +244,43 @@ const auth = (req, res, next) => {
 	next();
 };
 
-// Authentication Required
 app.use(auth);
 
-// *****************  Group Routes  ******************
+// * ================ Groups ================ * //
 
 app.use(groupRoutes, auth);
 
-// *****************************************************
+// * ================ Home ================ * //
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
 		// select from database all user transactions
 
-		const transactions = db.manyOrNone(
-			// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-			"SELECT * FROM transactions",
-			req.session.user.id
-		).then((transactions) => {
-			const reciept_transactions = db.manyOrNone(
+		const transactions = db
+			.manyOrNone(
 				// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-				"SELECT * FROM reciept_transactions",
+				"SELECT * FROM transactions",
 				req.session.user.id
-			).then((reciept_transactions) => {
-				res.render("pages/home", {
-					user: req.session.user,
-					username: req.session.user.username,
-					balance: req.session.user.balance,
-					transactions: transactions,
-					reciept_transactions: reciept_transactions,
-					balance: req.session.user.balance,
-				});
+			)
+			.then((transactions) => {
+				const reciept_transactions = db
+					.manyOrNone(
+						// "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+						"SELECT * FROM reciept_transactions",
+						req.session.user.id
+					)
+					.then((reciept_transactions) => {
+						res.render("pages/home", {
+							user: req.session.user,
+							username: req.session.user.username,
+							balance: req.session.user.balance,
+							transactions: transactions,
+							reciept_transactions: reciept_transactions,
+							balance: req.session.user.balance,
+						});
+					});
 			});
-		});
-
 	} else {
-		// res.redirect("/login", { message: "Please login to access this page." });
 		res.render(
 			"/login?error=" + encodeURIComponent("Please login to access this page.")
 		);
@@ -535,6 +398,7 @@ app.post("/groupexpense", async function(req, res) {
 
 	res.render("pages/home", { message: "Successfully added group expense." });
 });
+app.use(transactionRoutes, auth);
 
 app.get("/logout", (req, res) => {
 	req.session.destroy();
