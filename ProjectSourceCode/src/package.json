@@ -36,7 +36,6 @@
 		"prestart": "npm install",
 		"start": "nodemon index.js && npx sass resources/scss/custom.scss resources/css/custom.css --watch",
 		"test": "mocha",
-		"testandrun": "npm run prestart && npm run test && npm start",
-		"build": "npx tailwindcss -i ./resources/css/styles.css -o ./resources/css/public/output.css --watch"
+		"testandrun": "npm run prestart && npm run test && npm start"
 	}
 }

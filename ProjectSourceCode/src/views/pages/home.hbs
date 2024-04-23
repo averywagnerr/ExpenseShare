@@ -39,7 +39,6 @@
 <form>
     <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
     <label class = "box" name="balance">{{balance}}</label>
-    <label class = "box"></label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
     <br>
@@ -55,9 +54,9 @@
         <label class="black-text box-titles">In/Out Cash</label>
         <br>
         <label class="black-text" for="deposit-amount">Deposit:</label>
-        <input class= "border-2 border-grey" type="text" name="deposit_amount" placeholder="0" required/><br/>
+        <input class= "border-2 border-gray-350" type="text" name="deposit_amount" placeholder="0" required/><br/>
         <label class="black-text" type="withdraw-amount">Withdraw:</label>
-        <input class= "border-2 border-grey" type="text" name="withdraw_amount" placeholder="0" required/><br/>
+        <input class= "border-2 border-gray-350" type="text" name="withdraw_amount" placeholder="0" required/><br/>
         <button class= "border-2 border-black" id="send_button" type="submit" class="black-text">
            Send
         </button>
@@ -70,9 +69,9 @@
         <label class="black-text box-titles">Group Pay</label>
         <br>
         <label class="black-text" for="expense-amount">Expense total:</label>
-        <input class= "border-2 border-grey" type="number" name="expense-amount" id="expense-amount"/><br/>
+        <input class= "border-2 border-gray-350" type="number" name="expense-amount" id="expense-amount"/><br/>
         <label class="black-text" for="share-amount">Percent that you pay of the expense:</label>
-        <input class= "border-2 border-grey" type="number" name="share-amount" id="share-amount" /><br/>
+        <input class= "border-2 border-gray-350" type="number" name="share-amount" id="share-amount" /><br/>
     </form>
 
     <button class= "border-2 border-black" id="calculate_button" type="submit" class="black-text" onclick="automatic_calc()">
