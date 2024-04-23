@@ -1,13 +1,16 @@
 // ********************** How to Test **********************************
-// TODO -  theres gotta be a better way
 /**
  * * Clear database before composing up `docker-compose down -v`
  * * Then, docker-compose up
  */
 
+
+// process.env.NODE_ENV = 'test'
+
 // ********************** Initialize server **********************************
 
-const server = require("../index"); //TODO: Make sure the path to your index.js is correctly added
+
+const server = require("../index"); // TODO: Make sure the path to your index.js is correctly added
 
 // ********************** Import Libraries ***********************************
 
@@ -20,8 +23,6 @@ const { assert, expect } = chai;
 // ********************** DEFAULT WELCOME TESTCASE ****************************
 
 // let User = require('../models/user.js') // TODO - create a User model
-// During the test the env variable is set to test // TODO - Create test ENV
-// process.env.NODE_ENV = 'test'; 
 
 describe("Server!", () => {
 	// Sample test case given to test / endpoint.
@@ -141,4 +142,79 @@ describe("Testing Register API", () => {
 				done();
 			});
 	});
+});
+
+// ***************************** Group Tests ************************************
+
+describe("Join & Create Groups",()  => {
+	
+	// TODO -- figure out test env 
+	// it("Inputs a test group", async (done) => {
+	// 	chai
+	// 		.request(server)
+	// 		.post("/createGroup")
+	// 		.send({ groupname: "New Test Group"})
+	// 		.end((err, res) => {
+	// 			expect(res).to.have.status(302);
+	// 			done();
+	// 		});
+
+		// const test_hash = await bcrypt.hash('testtoken', 10);
+
+		// await server.none('INSERT INTO groups (token, groupname) VALUES ($1, $2)', [hash, groupname]);
+	// })
+
+	/* 
+	 * Positive Case : A user can create a group by entering a group name.
+	 * Route: /createGroup
+	 * Input: { groupname: "New Test Group" }
+	 * Expect: res.status == 302
+	 */
+	it("Positive : /createGroup", (done) => {
+		chai
+			.request(server)
+			.post("/createGroup")
+			.send({ groupname: "New Test Group"})
+			.end((err, res) => {
+				expect(res).to.have.status(302);
+				done();
+			});
+	});
+
+	/* 
+	 * Positive Case : A user can join a group by entering a group name and join code.
+	 * Route: /joinGroup
+	 * Input: { groupname: "test group", token: "testtoken"}
+	 * Expect: res.status == 302
+	 */
+	it("Positive : /joinGroup", (done) => {
+		
+		chai
+			.request(server)
+			.post("/joinGroup")
+			.send({ groupname: "test group", token: "testtoken"})
+			.end((err, res) => {
+				expect(res).to.have.status(302);
+				done();
+			});
+	});
+
+	// TODO -- need test DB?
+	/*  
+	 * Negative Case : A user cannot join a group with an invalid join code.
+	 * Route: /joinGroup
+	 * Input: { groupname: "test group", token: "badtoken"}
+	 * Expect: res.status == 400
+	 */
+	// it("Negative : /joinGroup", (done) => {
+	// 	chai
+	// 		.request(server)
+	// 		.post("/joinGroup")
+	// 		.send({ groupname: "test group", token: "badtoken"})
+	// 		.end((err, res) => {
+	// 			// expect(res.message).to.equal(`The join code entered is incorrect.`)
+	// 			expect(res).to.have.status(400);
+	// 			done();
+	// 		});
+	// });
 });
