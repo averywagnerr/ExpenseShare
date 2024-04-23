@@ -474,6 +474,17 @@ app.post("/deposit", async (req, res) => {
 })
 
 app.post("/groupexpense", async function(req, res) {
+	//Get the group token
+	// let groupToken = "";
+	// await db.oneOrNone("SELECT * FROM groups WHERE groupname = $1", req.body.groupname).then((group) => {
+	// 	if (!group) {
+	// 		res.render("pages/home", { message: "Group does not exist!", error: true });
+	// 		return;
+	// 	}
+	// 	groupToken = group.grouptoken;
+	// });
+
+
 	//INFO: Make sure the sender is in the group
 	let inGroup = false;
 	await db.oneOrNone("SELECT * FROM user_to_groups WHERE username = $1 AND groupname = $2",
