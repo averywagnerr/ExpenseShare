@@ -40,18 +40,19 @@ Router.post("/createGroup", async (req, res) => {
 
       console.log(`groupname: ${req.body.groupname}`);
 
-      // Hash the joincode using bcrypt library
-      const hash = await bcrypt.hash(toString(token), 10);
 
-      await t.none("INSERT INTO groups(token, groupname) VALUES ($1, $2);", [
-        hash,
+      await t.none("INSERT INTO groups(groupname) VALUES ($1);", [
+        req.body.groupname,
+      ]);
+      await t.none("INSERT INTO user_to_groups(username,groupname) VALUES ($1, $2);", [
+        req.session.user.username,
         req.body.groupname,
       ]);
      
       // res.send({ message: "Successfully created group!"})
       // Redirect to the home page with a success message
       res.render(
-        "/home", { message: "Successfully created group!" }
+        "../views/pages/home", { message: "Successfully created group!" }
       );
     });
   } catch (e) {
@@ -95,29 +96,18 @@ Router.post("/joinGroup", async (req, res) => {
     );
     if (!group) {
       res.status(404);
-      res.render("pages/joinGroup", {
+      res.render("../views/pages/createGroup", {
         error: `The group ${req.body.groupname} not found in database.`,
       });
       return;
     }
 
-    // check if tokens match (PK ?)
-    const match = await bcrypt.compare(req.body.token, group.token);
-
-    if (!match) {
-       res.status(400);
-       res.render("pages/joinGroup", {
-        error: `The join code entered is incorrect.`,
-      });
-      return;
-      // var err = new Error(`The join code entered is incorrect.`);
-      // err.status = 400;
-      // console.log(`Error: ${err.message}, ${err.status}`);
-      // throw err;
-    }
-    await t.none(
-      "INSERT INTO user_to_groups (username, token) VALUES ($1, $2)",
-      [req.session.user.username, group.token]
+    await t.none("INSERT INTO user_to_groups(username,groupname) VALUES ($1, $2);", [
+      req.session.user.username,
+      req.body.groupname,
+    ]);
+    res.render(
+      "../views/pages/home", { message: "Successfully joined group!" }
     );
     // let groups = [req.session.user.groups];
     // groups.append(group);

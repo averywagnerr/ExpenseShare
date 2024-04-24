@@ -11,14 +11,14 @@ userdata = [["admin", "admin", "admin@admin"], ["user", "user", "user@user"], ["
 ["connor", "connor", "connor@connor"], ["avery", "avery", "avery@avery"], ["mariana", "mariana", "mariana@mariana"], ["tyler", "tyler", "tyler@tyler"]];
 
 // INFO: Group data for the form groupname
-groupdata = [["admintoken", "admin group"], ["1234567890", "user group"], ["testtoken", "test group"]];
+groupdata = [["admin group"], ["user group"], ["test group"]];
 // groupdata = ["admin group", "user group", "test group"];
 
 // INFO: Transaction data for the form [sender, receiver, amount, description] 
 transactiondata = [["admin", "mason", 10000, "free monet admin"], ["connor", "mason", 10000, "free moneeet"], ["tyler", "mason", 10000, "free money"], ["mason", "admin", 200, "bye money"], ["avery", "mariana", 100000, "h money"]];
 
 // INFO: Group membership data of the form [username, groupname, token]
-groupmembershipdata = [["admin", "admin group", "admintoken"], ["test", "test group", "testtoken"], ["mason", "admin group", "admintoken"]];
+groupmembershipdata = [["admin", "admin group"], ["test", "test group"], ["mason", "admin group"]];
 // groupmembershipdata = [["admin", "admin group"], ["mason", "admin group"], ["test", "test group"]];
 
 //INFO: TRansaction membership data of the form [transactionid, username, is_sender]

@@ -34,6 +34,9 @@
       </div>
     </nav> --}}
   {{!-- </head> --}}
+
+  {{> message}}
+
 <head>
   <link href="/css/output.css" rel="stylesheet">
 </head>
@@ -47,8 +50,6 @@
         <label class = "box">{{members}}</label>
     <!--<input type="text" name="password"/><br/>-->
 </form>
-
-{{> message}}
 
 <div class = "box">
     <form action="/deposit" method="post">
