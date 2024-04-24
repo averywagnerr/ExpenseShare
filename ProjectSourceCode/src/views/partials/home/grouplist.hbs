@@ -1,17 +1,17 @@
 <div class = "box">
-  <h2 class="black-text box-titles">Groups you are in</h2>
+  <h2 class="black-text box-titles">Groups you are in:</h2>
 
 <table>
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Amount</th>
-      <th>Date</th>
+      <th>Group name</th>
     </tr>
   </thead>
   <tbody>
     {{#each groups}}
-			{{groupname}}
+    <tr>
+      <td>{{ groupname }}</td>
+    </tr>
     {{/each}}
   </tbody>
   </table>

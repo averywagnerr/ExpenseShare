@@ -21,6 +21,13 @@ Router.get("/joinGroup", (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -30,6 +37,7 @@ Router.get("/joinGroup", (req, res) => {
         .then((transactions) => {
           res.render("../views/pages/joinGroup", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -37,6 +45,7 @@ Router.get("/joinGroup", (req, res) => {
             balance: req.session.user.balance,
           });
         });
+      });
     });
 });
 
@@ -51,6 +60,13 @@ Router.get("/createGroup", (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -60,6 +76,7 @@ Router.get("/createGroup", (req, res) => {
         .then((transactions) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -67,6 +84,7 @@ Router.get("/createGroup", (req, res) => {
             balance: req.session.user.balance,
           });
         });
+      });
     });
 });
 
@@ -109,6 +127,7 @@ Router.post("/createGroup", async (req, res) => {
               });
             });
         });
+        return;
       }
 
       console.log(`groupname: ${req.body.groupname}`);
@@ -131,23 +150,32 @@ Router.post("/createGroup", async (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
-      const transactions = db
-        .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
-        )
-        .then((transactions) => {
-          res.render("../views/pages/home", {
-            user: req.session.user,
-            username: req.session.user.username,
-            reciept_transactions: reciept_transactions,
-            transactions: transactions,
-            message: "Successfully created group!",
-            balance: req.session.user.balance,
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
+        const transactions = db
+          .manyOrNone(
+            // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+            "SELECT * FROM transactions",
+            req.session.user.id
+          )
+          .then((transactions) => {
+            res.render("../views/pages/home", {
+              user: req.session.user,
+              groups: groups,
+              username: req.session.user.username,
+              reciept_transactions: reciept_transactions,
+              transactions: transactions,
+              message: "Successfully created group!",
+              balance: req.session.user.balance,
+            });
           });
         });
-    });
+      });
     });
   } catch (e) {
     console.error(e);
@@ -159,6 +187,13 @@ Router.post("/createGroup", async (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -168,6 +203,7 @@ Router.post("/createGroup", async (req, res) => {
         .then((transactions) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -175,6 +211,7 @@ Router.post("/createGroup", async (req, res) => {
             balance: req.session.user.balance,
           });
         });
+      });
     });
   }
 });
@@ -196,6 +233,13 @@ Router.get("/joinGroup", (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -205,6 +249,7 @@ Router.get("/joinGroup", (req, res) => {
         .then((transactions) => {
           res.render("../views/pages/joinGroup", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -213,6 +258,7 @@ Router.get("/joinGroup", (req, res) => {
             balance: req.session.user.balance,
           });
         });
+      });
     });
 });
 
@@ -241,6 +287,13 @@ Router.post("/joinGroup", async (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -248,15 +301,17 @@ Router.post("/joinGroup", async (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
-          res.render("../views/pages/joinGroup", {
+          res.render("../views/pages/createGroup", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
-            error: `The group ${req.body.groupname} not found in database.`,
+            message: "Group not found in database, please create a group.",
             balance: req.session.user.balance,
           });
         });
+      });
     });
       return;
     }
@@ -273,6 +328,13 @@ Router.post("/joinGroup", async (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -283,12 +345,14 @@ Router.post("/joinGroup", async (req, res) => {
           res.render("../views/pages/home", {
             message: "Successfully joined group!",
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             balance: req.session.user.balance,
           });
         });
+      });
     });
     // let groups = [req.session.user.groups];
     // groups.append(group);
@@ -307,6 +371,13 @@ Router.post("/joinGroup", async (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -316,13 +387,15 @@ Router.post("/joinGroup", async (req, res) => {
         .then((transactions) => {
           res.render("../views/pages/home", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
-            message: "An error occurred while joining the group. Please try again later.",
+            message: "You already joined this group.",
             balance: req.session.user.balance,
           });
         });
+      });
     });
     // res.redirect("/login?error=" + encodeURIComponent(err.message));
   });

@@ -102,6 +102,13 @@ Router.post("/upload", uploadStorage.single("file"), (req, res) => {
       req.session.user.id
     )
     .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
       const transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
@@ -111,12 +118,14 @@ Router.post("/upload", uploadStorage.single("file"), (req, res) => {
         .then((transactions) => {
           res.render("pages/home", {
             user: req.session.user,
+            groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             balance: req.session.user.balance,
           });
         });
+      });
     });
 
   return;
