@@ -46,26 +46,26 @@ Our application allows users to send transactions to others in the group. The ap
 |     Avery Wagner     |     avery.wagner@colorado.edu     |  averywagnerr   |
 
 ## :gear: Tech Stack
-The main language that we used is javascript. 
-For UI, we used tailwindcss and handlebars 
-We used the mindee API which is an OCR API. 
-Our database is in MySQL and PostgreSQL 
-We also used multer to mitigate uploading files to the website 
-We used nodemailer to send emails to the users regarding their account
+The main language that we used is javascript. <br>
+For UI, we used tailwindcss and handlebars. <br>
+We used the mindee API which is an OCR API. <br>
+Our database is in MySQL and PostgreSQL. <br>
+We also used multer to mitigate uploading files to the website. <br>
+We used nodemailer to send emails to the users regarding their account. <br>
 
 ## :clipboard: Prerequisites
 Software to download before running the application: 
-Nodemailer 
-Multer 
-Tailwindcss 
-mindee 
-Handlebars 
-Bootstrap 
-Axios 
-bcrypt 
-nodemon 
-chai 
-mocha 
+Nodemailer <br>
+Multer <br>
+Tailwindcss <br>
+mindee <br>
+Handlebars <br>
+Bootstrap <br>
+Axios <br>
+bcrypt <br>
+nodemon <br>
+chai <br>
+mocha <br>
 
 ## :zap: How to Run Locally
 Create an env file and enter these values: 
@@ -79,10 +79,10 @@ API_KEY="45c59448df5500383d09c23125d4f5f7" <br>
 PASS="yqgz czqm jpcm evaa" <br>
 
 Then run the following comands in the terminal:
-docker-compose down -v
-docker-compose up
+docker-compose down -v <br>
+docker-compose up <br>
 
-Now the application should be available on the link displayed on "Link to Deployment".
+Now the application should be available on http://localhost:3000.
 ## :test_tube: Running Tests
 The tests will run automatically when you run the comand docker-compose up.
 
