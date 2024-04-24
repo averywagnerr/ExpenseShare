@@ -65,3 +65,7 @@ body {
       font-size: 20px;
       /*text-decoration: underline;*/
       }
+
+    .expense-color {
+      color: #5fffb6;
+    }
