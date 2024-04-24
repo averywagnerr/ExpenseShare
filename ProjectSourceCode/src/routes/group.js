@@ -10,7 +10,7 @@ const Router = express.Router();
 
 // let Group = require('../models/group');
 
-async function getGroups(req, db) {
+async function getGroups(req, res) {
   try {
     const groups = await db.manyOrNone(
       `SELECT g.groupname, g.token, ARRAY_AGG(u.username) AS members
@@ -144,18 +144,20 @@ Router.post("/createGroup", async (req, res) => {
       await t.none("INSERT INTO groups(token, groupname) VALUES ($1, $2);", [
         hash,
         req.body.groupname,
-      ]);
+      ]).then((r) => {
+         t.none("INSERT INTO user_to_groups (username, token, groupname) VALUES ($1, $2, $3)",
+        [req.session.user.username, hash, req.body.groupname])
+      });
 
-      const groups = getGroups(req);
-      res.redirect(302, "/home");
+      const groups = await getGroups(req);
+
       res
         .render("pages/home", {
           message: `Successfully created group!`,
           user: req.session.user,
           username: req.session.user.username,
           groups: groups,
-        })
-        .send();
+        });
 
       // res.send({ message: "Successfully created group!"})
       // Redirect to the home page with a success message
@@ -163,8 +165,7 @@ Router.post("/createGroup", async (req, res) => {
     });
   } catch (e) {
     console.error(e);
-    res.status(e.status);
-    res.render("pages/createGroup", { message: e.message });
+    res.status(500).render("pages/home", { message: e.message });
   }
 });
 
