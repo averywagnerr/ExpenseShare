@@ -70,35 +70,7 @@
     </div>
   </div>
   <div class="two">
-    <div Resume id="resume" class = "box dark:bg-gray-600 dark:text-white">
-
-        <label class="black-text box-titles dark:text-ES"> Payment History </label>
-        <table class ="centered">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Deposit Amount</th>
-                <th>Withdraw Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Userl</td>
-                <td>+$100</td>
-                <td>-$100</td>
-              </tr>
-              <tr>
-                <td>User2</td>
-                <td>+$200</td>
-                <td>-$200</td>
-              </tr>
-              <tr></tr>
-            </tbody>
-    </thead>
-    </table>
-    </body>
-    </div>
-  </div>
+    {{> home/payment deposit_withdrawl = deposit_withdrawl}}
 </section>
 
 
