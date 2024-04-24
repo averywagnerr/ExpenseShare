@@ -78,9 +78,10 @@
     <button class= "border-2 border-black" id="calculate_button" type="submit" class="black-text" onclick="automatic_calc()">
         Calculate
     </button>
+    <div>
+      <br> Amount of the expense you would pay: <br>
+    </div>
     <div id="calculate_button_result">
-     <br> Amount of the expense you would pay: <br>
-     $
     </div>
 
     <script>
@@ -90,7 +91,7 @@
         const percent_new = percent/100;
         const expense_new = percent_new * expense;
         //return expense;
-        document.getElementById('calculate_button_result').innerHTML += expense_new;
+        document.getElementById('calculate_button_result').innerHTML = "$" + expense_new;
        }
     </script>
 </div>

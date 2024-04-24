@@ -1,6 +1,3 @@
-// *****************************************************
-// <!-- Section 1 : Import Dependencies -->
-// *****************************************************
 const express = require("express"); // To build an application server or API
 const app = express();
 const handlebars = require("express-handlebars");
@@ -8,7 +5,7 @@ const Handlebars = require("handlebars");
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
-const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part C.
+
 
 // INFO: Connection to DB and initialize it with test data in initdata.js
 const { bcrypt, db } = require("./resources/js/initdata"); // Connect from postgres DB and initialize it with test data
@@ -27,11 +24,11 @@ const hbs = handlebars.create({
   partialsDir: __dirname + "/views/partials",
 });
 
-Handlebars.registerHelper("isEqual", function (arg1, arg2, options) {
-  if (arg1 == arg2) {
-    return true;
-  }
-  return false;
+Handlebars.registerHelper('isEqual', function(arg1, arg2,) {
+	if (arg1 == arg2) {
+		return true;
+	}
+	return false;
 });
 
 Handlebars.registerHelper("formatDate", function (datetime) {
@@ -66,11 +63,8 @@ app.use(
 app.use(express.static("resources"));
 app.use(uploadRoutes);
 
-// ***************************************************
-// <!-- Section 4 : API Routes -->
-//***************************************************
 
-// TODO - Include your API routes here
+// <!-- Section 4 : API Routes -->
 app.get("/db", (_, res) => {
   query = "SELECT * FROM users";
   db.tx(async (t) => {
@@ -96,16 +90,15 @@ app.get("/db", (_, res) => {
     });
 });
 
-app.get("/welcome", (req, res) => {
-  res.json({ status: "success", message: "Welcome!" });
+app.get("/welcome", (_, res) => {
+	res.json({ status: "success", message: "Welcome!" });
 });
 
-app.get("/", (req, res) => {
-  res.render("pages/landing");
+app.get("/", (_, res) => {
+	res.render("pages/landing");
 });
 
 // * ================ User Register ================ * //
-
 app.get("/register", (req, res) => {
   let errorMessage = req.query.error;
   let message = req.query.message;
@@ -293,9 +286,6 @@ app.get("/logout", (req, res) => {
   res.render("pages/logout");
 });
 
-// *****************************************************
 // <!-- Section 5 : Start Server-->
-// *****************************************************
-// starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
 console.log("Server is listening on port 3000");
