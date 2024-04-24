@@ -1,22 +1,28 @@
-<div class = "box dark:bg-gray-600 dark:text-white">
+<div class = "box w-full mx-auto px-4 dark:bg-gray-600 dark:text-white">
   <h2 class="black-text box-titles">Expenses</h2>
-
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Amount</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each transactions}}
-    <tr>
-      <td>{{ id }}</td>
-      <td>{{ amount }}</td>
-      <td>{{ date }}</td>
-    </tr>
-    {{/each}}
-  </tbody>
-  </table>
+	<table class="w-full max-w-full">
+		<thead>
+			<tr>
+				<th>Amount</th>
+				<th>To/From</th>
+				<th>Description</th>
+				<th>Date</th>
+			</tr>
+		</thead>
+		<tbody>
+		{{#each transactions}}
+			<tr class="p-6 border-black border-b py-8">
+				{{#if (isEqual ../username receiver)}}
+					<td class="text-green-500 font-bold">+{{ amount }}</td>
+					<td>{{ sender }}</td>
+				{{else}}
+					<td class="text-red-500 font-bold">-{{ amount }}</td>
+					<td>{{ receiver }}</td>
+				{{/if}}
+				<td class="max-w-96 break-words line-clamp-none">{{ description }}</td>
+				<td>{{ formatDate date }}</td>
+			</tr>
+		{{/each}}
+		</tbody>
+	</table>
 </div>

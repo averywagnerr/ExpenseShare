@@ -15,15 +15,14 @@ groupdata = [["admintoken", "admin group"], ["1234567890", "user group"], ["test
 // groupdata = ["admin group", "user group", "test group"];
 
 // INFO: Transaction data for the form [sender, receiver, amount, description] 
-transactiondata = [["admin", "mason", 10000, "free monet admin"], ["connor", "mason", 10000, "free moneeet"], ["tyler", "mason", 10000, "free money"]];
+transactiondata = [["admin", "mason", 10000, "free monet admin"], ["connor", "mason", 10000, "free moneeet"], ["tyler", "mason", 10000, "free money"], ["mason", "admin", 200, "bye money"], ["avery", "mariana", 100000, "h money"]];
 
-////  INFO: Group membership data of the form [username, groupname]
 // INFO: Group membership data of the form [username, groupname, token]
-groupmembershipdata = [["admin",  "admin group", "admintoken"], ["test", "test group", "testtoken"]];
+groupmembershipdata = [["admin", "admin group", "admintoken"], ["test", "test group", "testtoken"], ["mason", "admin group", "admintoken"]];
 // groupmembershipdata = [["admin", "admin group"], ["mason", "admin group"], ["test", "test group"]];
 
 //INFO: TRansaction membership data of the form [transactionid, username, is_sender]
-transactionmembershipdata = [[1, "admin", true], [1, "mason", false]];
+transactionmembershipdata = [[1, "admin", true], [1, "mason", false], [2, "connor", true], [2, "mason", false], [3, "tyler", true], [3, "mason", false], [4, "mason", true], [4, "admin", false], [5, "avery", true], [5, "mariana", false]];
 
 
 const dbConfig = {
@@ -133,17 +132,15 @@ async function insertGroupMemberships(groupmemberships) {
 			const group = await db.oneOrNone(
 				`SELECT * FROM groups WHERE groups.groupname = $1`,
 				groupname
-			  );
+			);
 
 			const match = await bcrypt.compare(token, group.token);
 			if (!match) {
 				throw new Error(`Tokens do not match.`);
 			};
 
-			await db.none('INSERT INTO user_to_groups (username, token) VALUES ($1, $2)', [username, group.token]);
-			// await db.none('INSERT INTO user_to_groups (username, groupname, token) VALUES ($1, $2, $3)', [username, groupname, group.token]);
+			await db.none('INSERT INTO user_to_groups (username, groupname, token) VALUES ($1, $2, $3)', [username, groupname, group.token]);
 
-			// await db.none('INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)', [username, groupname]);
 			successes++;
 		} catch (error) {
 			console.error('Error inserting group membership =>', error);
