@@ -251,7 +251,6 @@ app.get("/home", (req, res) => {
 				[req.session.user.username]
 			)
 			.then((transactions) => {
-				console.log(transactions);
 				db
 					.manyOrNone(
 						"SELECT * FROM reciept_transactions",
