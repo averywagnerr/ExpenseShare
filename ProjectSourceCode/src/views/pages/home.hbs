@@ -60,10 +60,10 @@
             <label class="box-titles dark:text-ES">In/Out Cash</label>
             <br>
             <label class="black-text" for="deposit-amount">Deposit:</label>
-            <input class= "border-2 border-gray-350" type="text" name="deposit_amount" placeholder="0" required/><br/>
+            <input class= "border-2 border-gray-350 dark:text-black" type="text" name="deposit_amount" placeholder="0" required/><br/>
             <label class="black-text" type="withdraw-amount">Withdraw:</label>
-            <input class= "border-2 border-gray-350" type="text" name="withdraw_amount" placeholder="0" required/><br/>
-            <button class= "border-2 border-black" id="send_button" type="submit" class="black-text">
+            <input class= "border-2 border-gray-350 dark:text-black" type="text" name="withdraw_amount" placeholder="0" required/><br/>
+            <button class= "border-2 border-black dark:bg-ES dark:text-black" id="send_button" type="submit" class="black-text">
               Send
             </button>
         </form>
@@ -113,7 +113,7 @@
         <form action="/upload" method="POST" enctype="multipart/form-data" id="reciept_form">
             <label class="black-text" for="file">Submit your reciept:</label> <br>
             <input type="file" name="file" id="file"/><br/>
-            <button class= "border-2 border-black" type="submit" class="black-text" >
+            <button class= "border-2 border-black dark:bg-ES dark:text-black" type="submit" class="black-text" >
               Submit
             </button>
         </form>
@@ -132,12 +132,12 @@
             <label class="black-text box-titles dark:text-ES">Calculate potential expense</label>
             <br>
             <label class="black-text" for="expense-amount">Expense total:</label>
-            <input class= "border-2 border-gray-350" type="number" name="expense-amount" id="expense-amount"/><br/>
+            <input class= "border-2 border-gray-350 dark:text-black" type="number" name="expense-amount" id="expense-amount"/><br/>
             <label class="black-text" for="share-amount">Percent that you pay of the expense:</label>
-            <input class= "border-2 border-gray-350" type="number" name="share-amount" id="share-amount" /><br/>
+            <input class= "border-2 border-gray-350 dark:text-black" type="number" name="share-amount" id="share-amount" /><br/>
         </form>
 
-        <button class= "border-2 border-black" id="calculate_button" type="submit" class="black-text" onclick="automatic_calc()">
+        <button class= "border-2 border-black dark:bg-ES dark:text-black" id="calculate_button" type="submit" class="black-text" onclick="automatic_calc()">
             Calculate
         </button>
         <div id="calculate_button_result">
@@ -161,11 +161,11 @@
     {{> home/grouppay }}
   </div>
 </section>
-
-<br> <br> <br>
+<p style="padding-bottom:200px">&nbsp;</p>
 
 {{> home/expenses transactions=transactions}}
 
+<p style="padding-bottom:15px">&nbsp;</p>
 </div>
 </html>
 
