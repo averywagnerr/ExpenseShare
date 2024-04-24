@@ -69,15 +69,14 @@ mocha
 
 ## :zap: How to Run Locally
 Create an env file and enter these values: 
-# database credentials 
-POSTGRES_USER="postgres" 
-POSTGRES_PASSWORD="password" 
-POSTGRES_DB="users_db" 
 
-# Node vars 
-SESSION_SECRET="super duper secret!" 
-API_KEY="45c59448df5500383d09c23125d4f5f7" 
-PASS="yqgz czqm jpcm evaa"
+POSTGRES_USER="postgres" <br>
+POSTGRES_PASSWORD="password" <br>
+POSTGRES_DB="users_db" <br>
+
+SESSION_SECRET="super duper secret!" <br>
+API_KEY="45c59448df5500383d09c23125d4f5f7" <br>
+PASS="yqgz czqm jpcm evaa" <br>
 
 Then run the following comands in the terminal:
 docker-compose down -v
