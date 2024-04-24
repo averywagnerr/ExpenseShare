@@ -10,51 +10,103 @@ const Router = express.Router();
 
 // let Group = require('../models/group');
 
-const getGroups = async (req, res) => {
-  const members = [];
-  const groups = [];
+async function getGroups(req, db) {
   try {
-    await db
-      .manyOrNone(
-        "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
-        req.body.groupname
-      )
-      //   .manyOrNone(
-      //   "SELECT username FROM user_to_groups WHERE groupname = $1",
-      //   req.body.groupname
-      // )
-      .then((users) => {
-        users.forEach((user) => {
-          console.log("User: ", user);
-          members.push(user.username);
-        });
-      });
-
-    await db
-      .manyOrNone(
-        "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.username = $1",
-        // "SELECT (groupname, token) FROM user_to_groups WHERE username = $1",
-        req.session.user.username
-      )
-      .then((groups_res) => {
-        groups_res.forEach((group) => {
-          console.log("Group: ", group);
-          const group_model = {
-            groupname: group.groupname,
-            token: group.token, // TODO : decrypt
-            members: members,
-          };
-
-          groups.push(group_model);
-        });
-      })
-
+    const groups = await db.manyOrNone(
+      `SELECT g.groupname, g.token, ARRAY_AGG(u.username) AS members
+       FROM groups g
+       INNER JOIN user_to_groups utg ON g.token = utg.token AND g.groupname = utg.groupname
+       INNER JOIN users u ON utg.username = u.username
+       WHERE utg.username = $1
+       GROUP BY g.groupname, g.token`,
+      [req.session.user.username]
+    );
+    groups.forEach((g) => {
+      console.log(`Group Name:`, g.groupname);
+      console.log(`Members:`, g.members);
+    });
     return groups;
   } catch (e) {
     console.error(e);
+    throw e;
+  }
+}
+
+// async function getGroups(req, db) {
+//   const groupname = req.body.groupname ? req.body.groupname : null;
+
+//   const members = [];
+//   const groups = [];
+//   try {
+//     const groups_res = await db
+//       .manyOrNone(
+//         "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.username = $1",
+//         // "SELECT (groupname, token) FROM user_to_groups WHERE username = $1",
+//         req.session.user.username
+//       )
+//       .then((groups_res) => {
+//         groups_res.forEach((group) => {
+
+//           console.log("Group: ", group);
+//           if (!groupname) {
+//             groupname = group.groupname;
+//           }
+//           const group_model = {
+//             groupname: group.groupname,
+//             token: group.token, // TODO : decrypt
+//             members: members,
+//           };
+
+//           groups.push(group_model);
+//         });
+//       });
+
+//       const users = db.manyOrNone(
+//         "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
+//         // req.body.groupname
+//         groupname
+//       )
+//       .then((users) => {
+//         users.forEach((user) => {
+//           console.log("User: ", user);
+//           members.push(user.username);
+
+//         });
+//       });
+//       // groups_res.forEach((group) => {
+//         // const users = db.manyOrNone(
+//         //   "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
+//         //   // req.body.groupname
+//         //   group.groupname
+//         // );
+//         // .then((users) => {
+//         //   users.forEach((user) => {
+//         //     console.log("User: ", user);
+//         //     members.push(user.username);
+//         //   });
+//         // });
+//         // users.forEach((u) => {
+//         //   members.push(u.username);
+//         // })
+
+//       // });
+
+//     return groups;
+//   } catch (e) {
+//     console.error(e);
+//     // res.status(500).send();
+//     throw e;
+//   }
+// };
+
+Router.get("/getGroups", async (req, res) => {
+  try {
+    const groups = await getGroups(req);
+    res.json(groups);
+  } catch (error) {
     res.status(500).send();
   }
-};
+});
 
 Router.get("/joinGroup", (req, res) => {
   let errorMessage = req.query.error;
@@ -188,16 +240,15 @@ Router.post("/joinGroup", async (req, res) => {
 
     // const groups = getGroups(req);
 
-    const groups = await getGroups(req,res);
+    const groups = await getGroups(req, res);
 
     // res.redirect(302, "/home");
-    res
-      .render("pages/home", {
-        message: `Succesfully joined ${req.body.groupname}!`,
-        user: req.session.user,
-        username: req.session.user.username,
-        groups: groups,
-      });
+    res.render("pages/home", {
+      message: `Succesfully joined ${req.body.groupname}!`,
+      user: req.session.user,
+      username: req.session.user.username,
+      groups: groups,
+    });
   }).catch((err) => {
     console.error(err);
     // res.status(err.status);
@@ -211,4 +262,4 @@ Router.post("/joinGroup", async (req, res) => {
   });
 });
 
-module.exports = Router;
+module.exports = { Router, getGroups };

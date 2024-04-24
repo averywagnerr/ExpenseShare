@@ -1,29 +1,24 @@
-<div class = "box container w-50 px-4">
+<div class = " box ">
   <h2 class="h4  black-text box-titles">Groups</h2>
 
-<table class=" max-w-full">
+<table class="p-8 table mx-auto">
   <thead>
     <tr>
-				<th>Name</th>
-				<th>Members</th>
+				<th scope="col" colspan="2" class="w-max">Name</th>
+				<th scope="col" colspan="2">Members</th>
     </tr>
   </thead>
   <tbody >
     {{#each groups}}
-    <tr class="flex p-6 py-8 border-b border-black ">
+    <tr class="flex px-2 py-8 border-b border-black ">
 
-      <td>
+      <td colspan="2" class="">
 			  {{groupname}}
       </td>
-      <td>{{members}}</td>
-      {{/each}}
+      <td colspan="2">{{members}}</td>
 
     </tr>
-    <tr>
-      <td>Test</td>
-      <td>Me</td>
-    </tr>
-      
+      {{/each}}
   </tbody>
   </table>
 </div>
