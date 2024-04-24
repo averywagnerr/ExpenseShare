@@ -71,7 +71,6 @@ Router.post("/groupexpense", async function(req, res) {
 		)
 		.then((users) => {
 			users.forEach((user) => {
-				console.log("User: ", user);
 				members.push(user.username);
 			});
 		})
@@ -92,15 +91,18 @@ Router.post("/groupexpense", async function(req, res) {
 					[
 						req.session.user.username,
 						members[i],
-						req.body.expenseamount / members.length,
+						req.body.expenseamount / (members.length),
 						req.body.description,
 					]
 				)
-				.then((data) => {
-					console.log("Transaction data: ", data);
-					db.none(
+				.then(async (data) => {
+					await db.none(
 						"INSERT INTO user_to_transactions (username, transaction_id, is_sender) VALUES ($1, $2, $3)",
 						[members[i], data.id, false]
+					);
+					await db.none(
+						"INSERT INTO user_to_transactions (username, transaction_id, is_sender) VALUES ($1, $2, $3)",
+						[req.session.user.username, data.id, true]
 					);
 				})
 				.catch((err) => {
