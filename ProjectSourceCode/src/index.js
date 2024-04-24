@@ -257,15 +257,23 @@ app.get("/home", (req, res) => {
 						req.session.user.id
 					)
 					.then((reciept_transactions) => {
+						const deposit_withdrawl = db
+						.manyOrNone(
+						"SELECT * FROM deposit_withdrawl",
+						req.session.user.id
+						)
+						.then((deposit_withdrawl) => {
 						res.render("pages/home", {
 							user: req.session.user,
 							username: req.session.user.username,
 							balance: req.session.user.balance,
 							transactions: transactions,
 							reciept_transactions: reciept_transactions,
+							deposit_withdrawl: deposit_withdrawl,
 							balance: req.session.user.balance,
 						});
 					});
+				});
 			});
 	} else {
 		res.render(
