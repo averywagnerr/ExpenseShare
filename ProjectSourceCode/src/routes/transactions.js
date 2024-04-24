@@ -1,15 +1,11 @@
 const express = require("express");
-const ShortUniqueId = require("short-unique-id");
-const { bcrypt, db } = require("../resources/js/initdata");
+const { db } = require("../resources/js/initdata");
 
-const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const Router = express.Router();
 
 
 Router.post("/deposit", async (req, res) => {
 	try {
-		console.log(req.body);
-
 		let deposit = parseFloat(req.body.deposit_amount);
 		let withdraw = parseFloat(req.body.withdraw_amount);
 
@@ -19,9 +15,9 @@ Router.post("/deposit", async (req, res) => {
 
 		newBalance = parseFloat(newBalance);
 
-		const query = await db.none(
+		await db.none(
 			`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`
-		); //update user balance in database
+		);
 
 		req.session.user.balance = newBalance;
 

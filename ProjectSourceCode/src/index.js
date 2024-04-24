@@ -1,6 +1,3 @@
-// *****************************************************
-// <!-- Section 1 : Import Dependencies -->
-// *****************************************************
 const express = require("express"); // To build an application server or API
 const app = express();
 const handlebars = require("express-handlebars");
@@ -63,11 +60,7 @@ app.use(express.static("resources"));
 app.use(uploadRoutes);
 
 
-// ***************************************************
 // <!-- Section 4 : API Routes -->
-//***************************************************
-
-// TODO - Include your API routes here
 app.get("/db", (_, res) => {
 	query = "SELECT * FROM users";
 	db.tx(async (t) => {
@@ -102,7 +95,6 @@ app.get("/", (_, res) => {
 });
 
 // * ================ User Register ================ * //
-
 app.get("/register", (req, res) => {
 	let errorMessage = req.query.error;
 	let message = req.query.message;
@@ -253,17 +245,14 @@ app.use(groupRoutes, auth);
 
 app.get("/home", (req, res) => {
 	if (req.session.user) {
-		// select from database all user transactions
-
 		db
 			.manyOrNone(
 				"SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-				// "SELECT * FROM transactions",
 				[req.session.user.username]
 			)
 			.then((transactions) => {
 				console.log(transactions);
-				const reciept_transactions = db
+				db
 					.manyOrNone(
 						"SELECT * FROM reciept_transactions",
 						req.session.user.id
@@ -293,9 +282,6 @@ app.get("/logout", (req, res) => {
 	res.render("pages/logout");
 });
 
-// *****************************************************
 // <!-- Section 5 : Start Server-->
-// *****************************************************
-// starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
 console.log("Server is listening on port 3000");
