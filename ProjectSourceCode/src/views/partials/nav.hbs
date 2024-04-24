@@ -4,40 +4,39 @@
       <a class="navbar-brand mb-0 h1" href="/">
         <img src="/img/text-logo-2.png" alt="" width="250">
       </a>
-      <ul class="navbar-nav">
+      <ul class="flex flex-row justify-between items-center">
         <li class="nav-item">
           <a class="nav-link" href="{{#if username}}/home{{else}}/"{{/if}}>Home</a>
         </li>
         {{#if username}}
-        <li class="nav-item">
-          <a class="nav-link" href="/joinGroup">Join a Group</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/createGroup">Create a Group</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/logout">Logout</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Hi, {{ username }}!</a>
-        </li>
-        {{else}}
-        <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="btn btn-primary mx-2" href="/register">Register</a>
-        </li>
+				<div class="flex flex-row gap-4 text-white">
+					<li class="px-4">
+						<a class="text-white" href="/joinGroup">Join a Group</a>
+					</li>
+					<li class="px-4">
+						<a class="btn btn-primary mx-2" href="/createGroup">Create a Group</a>
+					</li>
+					<li class="px-4">
+						<a class="text-white" href="/logout">Logout</a>
+					</li>
+					<li class="px-4">
+						<a class="text-white" href="#">Hi, {{ username }}!</a>
+					</li>
+					{{else}}
+					<li class="px-4">
+						<a class="text-white btn-primary" href="/login">Login</a>
+					</li>
+					<li class="px-4">
+						<a class="btn btn-primary mx-2" href="/register">Register</a>
+					</li>
+					<li class="px-4">
+						<a class="bg-white self-center my-auto mt-2" href="/">
+							<img src="/img/block-logo-1.svg" alt="" width="40">
+						</a>
+					</li>
+				</div>
         {{/if}}
-        <li class="nav-item">
-          <a class="navbar-brand" href="/">
-            <img src="/img/block-logo-1.svg" alt="" width="40">
-          </a>
-        </li>
       </ul>
     </div>
   </nav>
 </header>
-
-
-
