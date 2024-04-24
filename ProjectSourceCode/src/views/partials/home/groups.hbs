@@ -1,24 +1,29 @@
-<div class = " box ">
-  <h2 class="h4  black-text box-titles">Groups</h2>
 
-<table class="p-8 table mx-auto">
+<div class = "box">
+  <label class="black-text box-titles">Groups</label>
+
+<div class="table-responsive">
+<table class="table table-light">
   <thead>
     <tr>
-				<th scope="col" colspan="2" class="w-max">Name</th>
-				<th scope="col" colspan="2">Members</th>
+				<th scope="col" colspan="" class="w-max">Name</th>
+				<th scope="col" colspan="">Members</th>
     </tr>
   </thead>
   <tbody >
     {{#each groups}}
-    <tr class="flex px-2 py-8 border-b border-black ">
-
-      <td colspan="2" class="">
+    <tr class="">
+      <td colspan="" class="">
 			  {{groupname}}
       </td>
-      <td colspan="2">{{members}}</td>
-
+      <td colspan="">
+        {{members}}
+        </td>
     </tr>
       {{/each}}
   </tbody>
   </table>
+
+</div>
+
 </div>
