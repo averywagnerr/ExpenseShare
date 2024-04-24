@@ -13,43 +13,47 @@ const Router = express.Router();
 const getGroups = async (req, res) => {
   const members = [];
   const groups = [];
-
-  await db
-    .manyOrNone(
-      "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
-      req.body.groupname
-    )
-    //   .manyOrNone(
-    //   "SELECT username FROM user_to_groups WHERE groupname = $1",
-    //   req.body.groupname
-    // )
-    .then((users) => {
-      users.forEach((user) => {
-        console.log("User: ", user);
-        members.push(user.username);
+  try {
+    await db
+      .manyOrNone(
+        "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
+        req.body.groupname
+      )
+      //   .manyOrNone(
+      //   "SELECT username FROM user_to_groups WHERE groupname = $1",
+      //   req.body.groupname
+      // )
+      .then((users) => {
+        users.forEach((user) => {
+          console.log("User: ", user);
+          members.push(user.username);
+        });
       });
-    });
 
-  await db
-    .manyOrNone(
-      "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.username = $1",
-      // "SELECT (groupname, token) FROM user_to_groups WHERE username = $1",
-      req.session.user.username
-    )
-    .then((groups_res) => {
-      groups_res.forEach((group) => {
-        console.log("Group: ", group);
-        const group_model = {
-          groupname: group.groupname,
-          token: group.token, // TODO : decrypt
-          members: members,
-        };
+    await db
+      .manyOrNone(
+        "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.username = $1",
+        // "SELECT (groupname, token) FROM user_to_groups WHERE username = $1",
+        req.session.user.username
+      )
+      .then((groups_res) => {
+        groups_res.forEach((group) => {
+          console.log("Group: ", group);
+          const group_model = {
+            groupname: group.groupname,
+            token: group.token, // TODO : decrypt
+            members: members,
+          };
 
-        groups.push(group_model);
-      });
-    });
+          groups.push(group_model);
+        });
+      })
 
-  return groups;
+    return groups;
+  } catch (e) {
+    console.error(e);
+    res.status(500).send();
+  }
 };
 
 Router.get("/joinGroup", (req, res) => {
@@ -100,7 +104,6 @@ Router.post("/createGroup", async (req, res) => {
           groups: groups,
         })
         .send();
-
 
       // res.send({ message: "Successfully created group!"})
       // Redirect to the home page with a success message
@@ -182,17 +185,19 @@ Router.post("/joinGroup", async (req, res) => {
       [req.session.user.username, group.token, req.body.groupname]
     );
     // let groups = [];
-    const groups = getGroups(req);
 
-    res.redirect(302, "/home");
+    // const groups = getGroups(req);
+
+    const groups = await getGroups(req,res);
+
+    // res.redirect(302, "/home");
     res
       .render("pages/home", {
         message: `Succesfully joined ${req.body.groupname}!`,
         user: req.session.user,
         username: req.session.user.username,
         groups: groups,
-      })
-      .send();
+      });
   }).catch((err) => {
     console.error(err);
     // res.status(err.status);
