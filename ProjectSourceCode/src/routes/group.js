@@ -83,6 +83,33 @@ Router.post("/createGroup", async (req, res) => {
         `SELECT * FROM groups WHERE groups.groupname = $1`,
         req.body.groupname
       );
+      if(group.groupname = req.body.groupname)
+      {
+        const reciept_transactions = db
+        .manyOrNone(
+          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          "SELECT * FROM reciept_transactions",
+          req.session.user.id
+        )
+        .then((reciept_transactions) => {
+          const transactions = db
+            .manyOrNone(
+              // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+              "SELECT * FROM transactions",
+              req.session.user.id
+            )
+            .then((transactions) => {
+              res.render("../views/pages/joinGroup", {
+                user: req.session.user,
+                username: req.session.user.username,
+                reciept_transactions: reciept_transactions,
+                transactions: transactions,
+                message: "Group already exists",
+                balance: req.session.user.balance,
+              });
+            });
+        });
+      }
 
       console.log(`groupname: ${req.body.groupname}`);
 
