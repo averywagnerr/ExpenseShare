@@ -101,7 +101,7 @@ Router.post("/createGroup", async (req, res) => {
         `SELECT * FROM groups WHERE groups.groupname = $1`,
         req.body.groupname
       );
-      if(group.groupname = req.body.groupname)
+      if(group)
       {
         const reciept_transactions = db
         .manyOrNone(
@@ -399,6 +399,66 @@ Router.post("/joinGroup", async (req, res) => {
     });
     // res.redirect("/login?error=" + encodeURIComponent(err.message));
   });
+});
+
+
+
+Router.post("/members", async (req, res) => {
+	try {
+		// await db.tx(async (t) => {
+		// 	const members = await t.oneOrNone(
+		// 		`SELECT * FROM user_to_groups WHERE groupname = $1`,
+		// 		req.body.group_name
+		// 	);
+    // });
+
+    const reciept_transactions = db
+    .manyOrNone(
+      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+      "SELECT * FROM reciept_transactions",
+      req.session.user.id
+    )
+    .then((reciept_transactions) => {
+      const groups = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups",
+        req.session.user.id
+      )
+      .then((groups) => {
+        const members = db
+      .manyOrNone(
+        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+        "SELECT * FROM user_to_groups WHERE groupname = $1",
+        req.body.group_name
+      )
+      .then((members) => {
+      const transactions = db
+        .manyOrNone(
+          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          "SELECT * FROM transactions",
+          req.session.user.id
+        )
+        .then((transactions) => {
+          res.render("../views/pages/home", {
+            user: req.session.user,
+            groups: groups,
+            members: members,
+            username: req.session.user.username,
+            reciept_transactions: reciept_transactions,
+            transactions: transactions,
+            balance: req.session.user.balance,
+          });
+        });
+      });
+    });
+    });
+
+	} catch (err) {
+		console.log(err);
+		res.status(400).send();
+	}
+  return;
 });
 
 module.exports = Router;

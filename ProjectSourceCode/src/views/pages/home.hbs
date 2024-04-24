@@ -45,13 +45,24 @@
     <label class = "box" name="balance">{{balance}}</label>
     <!--<input type="text" name="username"/><br/>-->
         <!--{{balance}}-->
-    <br>
-    <label class="slightlysmallerbigtext black-text" for="members">Members:</label>
-        <label class = "box"></label>
     <!--<input type="text" name="password"/><br/>-->
 </form>
 
 {{> home/grouplist groups = groups}}
+
+<div class = "box">
+    <form action="/members" method="post">
+        <label class="black-text box-titles">Want to see the members in a specific group?</label>
+        <br>
+        <label class="black-text" for="deposit-amount">Group name:</label>
+        <input class= "border-2 border-gray-350" type="text" name="group_name"/><br/>
+        <button class= "border-2 border-black" id="send_button" type="submit" class="black-text">
+           Send
+        </button>
+    </form>
+</div>
+
+{{> home/members members = members}}
 
 <div class = "box">
     <form action="/deposit" method="post">
