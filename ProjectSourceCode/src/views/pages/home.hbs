@@ -42,16 +42,15 @@
   {{> message}}
 </div>
 
-{{!-- <section class="container"> --}}
   <div class="container">
 
   <div class="row">
 
     <div class="col">
-      <div class="box ">
-        <label class="black-text box-titles">Balance</label>
+      <div class="box dark:bg-gray-600">
+        <label class="black-text box-titles dark:text-ES">Balance</label>
         <br>
-        <p class="display-5">
+        <p class="display-5  dark:text-white">
         ${{balance}}
         </p>
       </div>
@@ -61,21 +60,8 @@
         {{> home/groups groups=groups}}
     </div>
     </div>
-{{!-- </section> --}}
-
-{{!-- </header>
-<div class = "dark:bg-gray-800">
-
-<form>
-    <label class="slightlysmallerbigtext dark:text-ES" for="balance">Balance:</label>
-    <label class = "box" name="balance">{{balance}}</label>
-    <br>
-    <label class="slightlysmallerbigtext dark:text-ES" for="members">Members:</label>
-        <label class = "box">{{members}}</label>
-</form> --}}
 
 
-{{!-- <section class="container"> --}}
 <div class="row">
 
 <div class="col">
@@ -84,10 +70,15 @@
             <label class="box-titles dark:text-ES">In/Out Cash</label>
         <form action="/deposit" method="post">
             <br>
-            <label class="black-text" for="deposit-amount">Deposit:</label>
-            <input class= "border-2 border-gray-350 dark:text-black" type="text" name="deposit_amount" placeholder="0" required/><br/>
-            <label class="black-text" type="withdraw-amount">Withdraw:</label>
-            <input class= "border-2 border-gray-350 dark:text-black" type="text" name="withdraw_amount" placeholder="0" required/><br/>
+            <div class=" input-group mb-3 dark:text-black" id="deposit-amount">
+              <span class="input-group-text">Deposit</span>
+               <input class= "form-control dark:text-black" type="text" name="deposit_amount" aria-label="Deposit amount" placeholder="0" required/>
+            </div>
+            <div class=" input-group mb-3 dark:text-black" id="deposit-amount">
+              <span class="input-group-text">Withdraw</span>
+               <input class= "form-control dark:text-black" type="text" name="withdraw_amount" aria-label="Deposit amount" placeholder="0" required/>
+            </div>
+            
             <button class= " btn btn-primary  dark:bg-ES dark:text-black" id="send_button" type="submit" class="black-text">
               Send
             </button>
@@ -176,14 +167,19 @@
 <div class="row">
  <div class="col">
   {{!-- <div class="one"> --}}
-    <div class = "box">
+    <div class = "box  dark:bg-gray-600 dark:text-white">
         <form>
             <label class="black-text box-titles dark:text-ES">Calculate Potential Expense</label>
             <br>
-            <label class="black-text" for="expense-amount">Expense Total:</label>
-            <input class= "border-2 border-gray-350 dark:text-black" type="number" name="expense-amount" id="expense-amount"/><br/>
-            <label class="black-text" for="share-amount">Percent that you pay of the expense:</label>
-            <input class= "border-2 border-gray-350 dark:text-black" type="number" name="share-amount" id="share-amount" /><br/>
+            <div class=" input-group mb-3 dark:text-black" id="expense-amount">
+              <span class="input-group-text">Expense Total:</span>
+              <input type="number " class="form-control border-2 border-gray-350 dark:text-black" aria-label="Expense Total">
+			      </div>
+            <div class=" input-group mb-3 dark:text-black" id="share-amount">
+              <span class="input-group-text">Percent You Pay:</span>
+              <input type="number " class="form-control border-2 border-gray-350 dark:text-black" aria-label="Your percentage">
+			      </div>
+            
         </form>
 
         <button class= "btn btn-primary dark:bg-ES dark:text-black" id="calculate_button" type="submit"  onclick="automatic_calc()">
