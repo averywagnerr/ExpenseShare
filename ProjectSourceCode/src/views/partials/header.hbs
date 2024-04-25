@@ -13,23 +13,29 @@
     <link href="/css/custom.css" rel="stylesheet">
     <link href="/css/output.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!--<script>
+    <script>
             tailwind.config = {
-        content: ["./*.html"],
+        content: [".././**/*.hbs"],
         theme: {
           extend: {
             colors: {
-              primary: {
-                blue: {
-                  light: "#00ccdd"
-                }
-              }
+              'ES': '#5fffb6',
             }
           }
         },
-        darkMode: "class"
+        darkMode: "selector"
       };
-    </script>-->
-
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.1/tailwind.min.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <link href="./style.css" rel="stylesheet" />
+    
+  </body>
 </head>
-<body class="h-100 d-flex flex-column">
+{{!-- <body class="h-100 d-flex flex-column"> --}}

@@ -18,15 +18,69 @@ Router.post("/deposit", async (req, res) => {
 		await db.none(
 			`UPDATE users SET balance = ${newBalance} WHERE username = '${req.session.user.username}'`
 		);
+		
+
+		await db
+			.one(
+				"INSERT INTO deposit_withdrawl (sender, deposit, withdrawl) VALUES ($1, $2, $3) RETURNING id",
+				[
+					req.session.user.username,
+					deposit,
+					withdraw,
+				]
+			)
+			.then(async (data) => {
+				await db.none(
+					"INSERT INTO user_to_deposit_withdrawl (username, deposit_id) VALUES ($1, $2)",
+					[req.session.user.username, data.id]
+				);
+			})
+			.catch((err) => {
+				console.error(err);
+				res.render("pages/home", {
+					message: "An error occurred while adding deposit and withdrawl.",
+					error: true,
+				});
+				return;
+			});
 
 		req.session.user.balance = newBalance;
 
-		res.redirect("/home");
+		const reciept_transactions = db
+		.manyOrNone(
+		"SELECT * FROM reciept_transactions",
+		req.session.user.id
+		)
+		.then((reciept_transactions) => {
+		const transactions = db
+			.manyOrNone(
+			"SELECT * FROM transactions",
+			req.session.user.id
+			)
+			.then((transactions) => {
+				const deposit_withdrawl = db
+			.manyOrNone(
+			"SELECT * FROM deposit_withdrawl",
+			req.session.user.id
+			)
+			.then((deposit_withdrawl) => {
+			res.render("pages/home", {
+				user: req.session.user,
+				deposit_withdrawl: deposit_withdrawl,
+				username: req.session.user.username,
+				reciept_transactions: reciept_transactions,
+				transactions: transactions,
+				balance: req.session.user.balance,
+			});
+			});
+		});
+		});
 
 	} catch (err) {
 		console.log(err);
 		res.status(400).send();
 	}
+	return;
 });
 
 Router.post("/groupexpense", async function(req, res) {

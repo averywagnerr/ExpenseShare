@@ -1,5 +1,5 @@
 {{> message}}
-
+<div class="bg-gray-800">
 <style>
     .grid {
         
@@ -39,7 +39,7 @@
 
 </style>
 
-<h1>Join Group</h1>
+<h1 class = "text-4xl dark:text-ES">Join Group</h1>
 
 <div class="grid">
 <form method="post" action="/joinGroup">
@@ -47,17 +47,17 @@
     <label for="groupname">Group Name</label> 
     <input type="text" name="groupname"/><br /> 
     <p>&nbsp;</p>
-    <button class= "border-2 border-black" id="submit_button" type="submit">
+    <button class= "btn btn-primary dark:bg-ES dark:text-black" id="submit_button" type="submit">
         Join
     </button>
     <p>&nbsp;</p>
 </form>
 
-    <p class="secondRow">
+    <p class="secondRow dark:text-white">
         <br> Or, 
-        <a href="./createGroup">Create a New Group</a> <br>
+        <a class = "underline dark:text-ES" href="./createGroup">Create a New Group</a> <br>
         <br> Or, 
         <a href="./home">Go back to home</a>
     </p>
+<p style="padding-bottom:315px">&nbsp;</p>
 </div>
-<p style="padding-bottom:50px">&nbsp;</p>

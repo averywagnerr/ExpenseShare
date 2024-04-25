@@ -1,0 +1,29 @@
+
+<div class = "box dark:bg-gray-600 dark:text-white">
+  <label class="black-text box-titles dark:text-ES">Groups</label>
+
+<div class="table-responsive">
+<table class="table table-light dark:table-dark">
+  <thead>
+    <tr>
+				<th scope="col" colspan="" class="w-max">Name</th>
+				<th scope="col" colspan="">Members</th>
+    </tr>
+  </thead>
+  <tbody >
+    {{#each groups}}
+    <tr class="">
+      <td colspan="" class="">
+			  {{groupname}}
+      </td>
+      <td colspan="">
+        {{members}}
+        </td>
+    </tr>
+      {{/each}}
+  </tbody>
+  </table>
+
+</div>
+
+</div>
