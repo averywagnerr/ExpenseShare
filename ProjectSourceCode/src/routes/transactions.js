@@ -48,24 +48,31 @@ Router.post("/deposit", async (req, res) => {
 
 		const reciept_transactions = db
 		.manyOrNone(
-		"SELECT * FROM reciept_transactions",
-		req.session.user.id
+		"SELECT * FROM reciept_transactions WHERE sender = $1",
+        [req.session.user.username]
 		)
 		.then((reciept_transactions) => {
 		const transactions = db
 			.manyOrNone(
-			"SELECT * FROM transactions",
-			req.session.user.id
+			"SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			[req.session.user.username]
 			)
 			.then((transactions) => {
 				const deposit_withdrawl = db
 			.manyOrNone(
-			"SELECT * FROM deposit_withdrawl",
-			req.session.user.id
+			"SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
 			)
 			.then((deposit_withdrawl) => {
+				const groups = db
+            .manyOrNone(
+              "SELECT * FROM user_to_groups WHERE username = $1",
+              [req.session.user.username]
+            )
+            .then((groups) => {
 			res.render("pages/home", {
 				user: req.session.user,
+				groups: groups,
 				deposit_withdrawl: deposit_withdrawl,
 				username: req.session.user.username,
 				reciept_transactions: reciept_transactions,
@@ -73,6 +80,7 @@ Router.post("/deposit", async (req, res) => {
 				balance: req.session.user.balance,
 			});
 			});
+		});
 		});
 		});
 
@@ -169,27 +177,32 @@ Router.post("/groupexpense", async function(req, res) {
   const reciept_transactions = db
     .manyOrNone(
       // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+	  [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
         // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+		[req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+			"SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+			[req.session.user.username]
         )
         .then((transactions) => {
+			const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             user: req.session.user,
             groups: groups,
+			deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -198,6 +211,7 @@ Router.post("/groupexpense", async function(req, res) {
         });
       });
     });
+});
 });
 
 module.exports = Router;

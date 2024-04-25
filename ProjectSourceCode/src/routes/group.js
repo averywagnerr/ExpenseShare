@@ -109,37 +109,41 @@ Router.get("/joinGroup", (req, res) => {
 
   const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/joinGroup", {
             user: req.session.user,
             groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
+            deposit_withdrawl: deposit_withdrawl,
             message: errorMessage || message,
             balance: req.session.user.balance,
           });
         });
       });
     });
+  });
 });
 
 Router.get("/createGroup", (req, res) => {
@@ -148,25 +152,27 @@ Router.get("/createGroup", (req, res) => {
 
   const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
             groups: groups,
@@ -174,11 +180,13 @@ Router.get("/createGroup", (req, res) => {
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             message: errorMessage || message,
+            deposit_withdrawl: deposit_withdrawl,
             balance: req.session.user.balance,
           });
         });
       });
     });
+  });
 });
 
 // * ================ Create Group ================ * //
@@ -199,26 +207,40 @@ Router.post("/createGroup", async (req, res) => {
         const reciept_transactions = db
         .manyOrNone(
           // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM reciept_transactions",
-          req.session.user.id
+          "SELECT * FROM reciept_transactions WHERE sender = $1",
+          [req.session.user.username]
         )
         .then((reciept_transactions) => {
           const transactions = db
             .manyOrNone(
               // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-              "SELECT * FROM transactions",
-              req.session.user.id
+              "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+              [req.session.user.username]
             )
             .then((transactions) => {
+              const deposit_withdrawl = db
+            .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+            ).then((deposit_withdrawl) => {
+            const groups = db
+            .manyOrNone(
+              "SELECT * FROM user_to_groups WHERE username = $1",
+              [req.session.user.username]
+            ).then((groups) => {
               res.render("../views/pages/joinGroup", {
                 user: req.session.user,
                 username: req.session.user.username,
                 reciept_transactions: reciept_transactions,
                 transactions: transactions,
+                groups: groups,
+                deposit_withdrawl: deposit_withdrawl,
                 message: "Group already exists",
                 balance: req.session.user.balance,
               });
             });
+          });
+          });
         });
         return;
       }
@@ -238,35 +260,39 @@ Router.post("/createGroup", async (req, res) => {
       // Redirect to the home page with a success message
       const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
         const transactions = db
           .manyOrNone(
-            // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-            "SELECT * FROM transactions",
-            req.session.user.id
+            "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+            [req.session.user.username]
           )
           .then((transactions) => {
+            const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
             res.render("../views/pages/home", {
               user: req.session.user,
               groups: groups,
               username: req.session.user.username,
               reciept_transactions: reciept_transactions,
               transactions: transactions,
+              deposit_withdrawl: deposit_withdrawl,
               message: "Successfully created group!",
               balance: req.session.user.balance,
             });
           });
+        });
         });
       });
     });
@@ -275,25 +301,27 @@ Router.post("/createGroup", async (req, res) => {
     res.status(e.status);
     const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
             groups: groups,
@@ -301,10 +329,12 @@ Router.post("/createGroup", async (req, res) => {
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             message: e.message,
+            deposit_withdrawl: deposit_withdrawl,
             balance: req.session.user.balance,
           });
         });
       });
+    });
     });
   }
 });
@@ -321,25 +351,27 @@ Router.get("/joinGroup", (req, res) => {
 
   const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/joinGroup", {
             user: req.session.user,
             groups: groups,
@@ -348,11 +380,13 @@ Router.get("/joinGroup", (req, res) => {
             transactions: transactions,
             message: errorMessage || message,
             error: errorMessage,
+            deposit_withdrawl: deposit_withdrawl,
             balance: req.session.user.balance,
           });
         });
       });
     });
+  });
 });
 
 Router.post("/joinGroup", async (req, res) => {
@@ -376,34 +410,38 @@ Router.post("/joinGroup", async (req, res) => {
       res.status(404);
       const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
             groups: groups,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
+            deposit_withdrawl: deposit_withdrawl,
             message: "Group not found in database, please create a group.",
             balance: req.session.user.balance,
           });
+        });
         });
       });
     });
@@ -417,35 +455,39 @@ Router.post("/joinGroup", async (req, res) => {
 
     const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             message: "Successfully joined group!",
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             balance: req.session.user.balance,
           });
         });
+      });
       });
     });
     // let groups = [req.session.user.groups];
@@ -460,34 +502,38 @@ Router.post("/joinGroup", async (req, res) => {
     console.error(err);
     const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             message: "You already joined this group.",
             balance: req.session.user.balance,
           });
+        });
         });
       });
     });
@@ -508,42 +554,45 @@ Router.post("/members", async (req, res) => {
 
     const reciept_transactions = db
     .manyOrNone(
-      // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
         const members = db
       .manyOrNone(
-        // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
         "SELECT * FROM user_to_groups WHERE groupname = $1",
         req.body.group_name
       )
       .then((members) => {
       const transactions = db
         .manyOrNone(
-          // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-          "SELECT * FROM transactions",
-          req.session.user.id
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+            "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+            [req.session.user.username]
+          ).then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             user: req.session.user,
             groups: groups,
             members: members,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             balance: req.session.user.balance,
           });
         });
+      });
       });
     });
     });

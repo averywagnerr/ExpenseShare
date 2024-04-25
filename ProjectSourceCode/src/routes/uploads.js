@@ -97,27 +97,26 @@ Router.post("/upload", uploadStorage.single("file"), (req, res) => {
 
   const reciept_transactions = db
     .manyOrNone(
-      "SELECT * FROM reciept_transactions",
-      req.session.user.id
+      "SELECT * FROM reciept_transactions WHERE sender = $1",
+      [req.session.user.username]
     )
     .then((reciept_transactions) => {
       const groups = db
       .manyOrNone(
         // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
-        "SELECT * FROM user_to_groups",
-        req.session.user.id
+        "SELECT * FROM user_to_groups WHERE username = $1",
+        [req.session.user.username]
       )
       .then((groups) => {
       const transactions = db
         .manyOrNone(
-          "SELECT * FROM transactions",
-          req.session.user.id
-        )
-        .then((transactions) => {
+          "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+          [req.session.user.username]
+        ).then((transactions) => {
           const deposit_withdrawl = db
           .manyOrNone(
-          "SELECT * FROM deposit_withdrawl",
-          req.session.user.id
+          "SELECT * FROM deposit_withdrawl WHERE sender = $1", 
+          [req.session.user.username]
           )
           .then((deposit_withdrawl) => {
           res.render("pages/home", {
@@ -132,9 +131,8 @@ Router.post("/upload", uploadStorage.single("file"), (req, res) => {
         });
       });
     });
+    return;
   });
-
-  return;
 });
 
 module.exports = Router;
