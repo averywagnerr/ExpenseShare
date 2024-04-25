@@ -240,7 +240,7 @@ app.use(auth);
 
 // * ================ Groups ================ * //
 
-app.use(groupRoutes, auth);
+app.use(groupRoutes.Router, auth);
 
 // * ================ Home ================ * //
 
