@@ -259,17 +259,26 @@ app.get("/home", async (req, res) => {
         const deposit_withdrawl = db
           .manyOrNone("SELECT * FROM deposit_withdrawl", req.session.user.id)
           .then((deposit_withdrawl) => {
+            const groups = db
+            .manyOrNone(
+              // "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
+              "SELECT * FROM user_to_groups",
+              req.session.user.id
+            )
+            .then((groups) => {
             res.render("pages/home", {
               user: req.session.user,
               username: req.session.user.username,
               balance: req.session.user.balance,
               transactions: transactions,
+              groups: groups,
               reciept_transactions: reciept_transactions,
               deposit_withdrawl: deposit_withdrawl,
               balance: req.session.user.balance,
               // groups: groups,
             });
           });
+        });
       });
     });
   } else {
