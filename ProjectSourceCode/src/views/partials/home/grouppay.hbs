@@ -5,18 +5,18 @@
     <form method="POST" action="/groupexpense" >
 			<div class="row">
 			<label class="black-text col-form-label dark:text-white" for="expenseamount">Expense</label>
-			<div class="col-sm-10 input-group mb-3 dark:text-black" id="expenseamount">
+			<div class="col-sm-10 input-group mb-3 dark:text-black" >
 				<span class="input-group-text">$</span>
-				<input type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" id="expenseamount">
+				<input type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" name="expenseamount">
 			</div>
 			</div>
 			<div class=" input-group mb-3 dark:text-black" >
 				<span class="input-group-text">Group Name</span>
-				<input type="text" class="form-control" aria-label="Group Name" id="groupname">
+				<input type="text" class="form-control" aria-label="Group Name" name="groupname">
 			</div>
 			<div class=" input-group mb-3 dark:text-black" id="desc">
 				<span class="input-group-text">Description</span>
-				<input type="text" class="form-control" aria-label="Description" id="desc">
+				<input type="text" class="form-control" aria-label="Description" name="description">
 			</div>
 
 			<button class= "btn btn-primary dark:bg-ES dark:text-black" id="calculate_button" type="submit" >
