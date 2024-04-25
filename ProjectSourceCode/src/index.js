@@ -6,14 +6,12 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 
-
 // INFO: Connection to DB and initialize it with test data in initdata.js
 const { bcrypt, db } = require("./resources/js/initdata"); // Connect from postgres DB and initialize it with test data
 const uploadRoutes = require("./routes/uploads");
 const groupRoutes = require("./routes/group");
 // const { groupRoutes, getGroups } = require("./routes/group");
 // const getGroups = groupRoutes.getGroups();
-
 
 const transactionRoutes = require("./routes/transactions");
 
@@ -24,11 +22,11 @@ const hbs = handlebars.create({
   partialsDir: __dirname + "/views/partials",
 });
 
-Handlebars.registerHelper('isEqual', function(arg1, arg2,) {
-	if (arg1 == arg2) {
-		return true;
-	}
-	return false;
+Handlebars.registerHelper("isEqual", function (arg1, arg2) {
+  if (arg1 == arg2) {
+    return true;
+  }
+  return false;
 });
 
 Handlebars.registerHelper("formatDate", function (datetime) {
@@ -63,7 +61,6 @@ app.use(
 app.use(express.static("resources"));
 app.use(uploadRoutes);
 
-
 // <!-- Section 4 : API Routes -->
 app.get("/db", (_, res) => {
   query = "SELECT * FROM users";
@@ -91,11 +88,11 @@ app.get("/db", (_, res) => {
 });
 
 app.get("/welcome", (_, res) => {
-	res.json({ status: "success", message: "Welcome!" });
+  res.json({ status: "success", message: "Welcome!" });
 });
 
 app.get("/", (_, res) => {
-	res.render("pages/landing");
+  res.render("pages/landing");
 });
 
 // * ================ User Register ================ * //
@@ -251,26 +248,29 @@ app.get("/home", async (req, res) => {
   if (req.session.user) {
     const groups = await groupRoutes.getGroups(req, db);
 
-    // select from database all user transactions
-
     db.manyOrNone(
       "SELECT * FROM transactions t JOIN user_to_transactions ut ON t.id = ut.transaction_id WHERE ut.username = $1",
       [req.session.user.username]
     ).then((transactions) => {
-      console.log(transactions);
-      const reciept_transactions = db
-        .manyOrNone("SELECT * FROM reciept_transactions", req.session.user.id)
-        .then((reciept_transactions) => {
-          res.render("pages/home", {
-            user: req.session.user,
-            username: req.session.user.username,
-            balance: req.session.user.balance,
-            transactions: transactions,
-            reciept_transactions: reciept_transactions,
-            balance: req.session.user.balance,
-            groups: groups,
+      db.manyOrNone(
+        "SELECT * FROM reciept_transactions",
+        req.session.user.id
+      ).then((reciept_transactions) => {
+        const deposit_withdrawl = db
+          .manyOrNone("SELECT * FROM deposit_withdrawl", req.session.user.id)
+          .then((deposit_withdrawl) => {
+            res.render("pages/home", {
+              user: req.session.user,
+              username: req.session.user.username,
+              balance: req.session.user.balance,
+              transactions: transactions,
+              reciept_transactions: reciept_transactions,
+              deposit_withdrawl: deposit_withdrawl,
+              balance: req.session.user.balance,
+              groups: groups,
+            });
           });
-        });
+      });
     });
   } else {
     res.render(

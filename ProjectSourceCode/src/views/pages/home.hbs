@@ -1,4 +1,4 @@
-<html class = "dark">
+<html>
 <header>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -63,11 +63,14 @@
     </div>
 {{!-- </section> --}}
 
-{{!-- <form>
-    <label class="slightlysmallerbigtext black-text" for="balance">Balance:</label>
+{{!-- </header>
+<div class = "dark:bg-gray-800">
+
+<form>
+    <label class="slightlysmallerbigtext dark:text-ES" for="balance">Balance:</label>
     <label class = "box" name="balance">{{balance}}</label>
     <br>
-    <label class="slightlysmallerbigtext black-text" for="members">Members:</label>
+    <label class="slightlysmallerbigtext dark:text-ES" for="members">Members:</label>
         <label class = "box">{{members}}</label>
 </form> --}}
 
@@ -77,15 +80,15 @@
 
 <div class="col">
   {{!-- <div class="one"> --}}
-    <div class = "box">
-            <label class="black-text box-titles">In/Out Cash</label>
+    <div class = "box dark:bg-gray-600 dark:text-white">
+            <label class="box-titles dark:text-ES">In/Out Cash</label>
         <form action="/deposit" method="post">
             <br>
             <label class="black-text" for="deposit-amount">Deposit:</label>
-            <input class= "border-2 border-gray-350" type="text" name="deposit_amount" placeholder="0" required/><br/>
+            <input class= "border-2 border-gray-350 dark:text-black" type="text" name="deposit_amount" placeholder="0" required/><br/>
             <label class="black-text" type="withdraw-amount">Withdraw:</label>
-            <input class= "border-2 border-gray-350" type="text" name="withdraw_amount" placeholder="0" required/><br/>
-            <button class= " btn btn-primary " id="send_button" type="submit" class="black-text">
+            <input class= "border-2 border-gray-350 dark:text-black" type="text" name="withdraw_amount" placeholder="0" required/><br/>
+            <button class= " btn btn-primary  dark:bg-ES dark:text-black" id="send_button" type="submit" class="black-text">
               Send
             </button>
         </form>
@@ -146,7 +149,7 @@
 
   <div class="col">
   {{!-- <div class="one"> --}}
-    <div class = "box">
+    <div class = "box dark:bg-gray-600 dark:text-white">
       Submit a photo of your receipt and add this transaction to your receipts transactions! <br>
         <form action="/upload" method="POST" enctype="multipart/form-data" id="reciept_form">
             <div class="mb-3">
@@ -154,7 +157,7 @@
               <input class="form-control formFile" type="file" id="formFile">
             </div>
             {{!-- <input class="" type="file" name="file" id="file"/><br/> --}}
-            <button class= "btn btn-primary " type="submit" class="black-text" >
+            <button class= "btn btn-primary  dark:bg-ES dark:text-black" type="submit" class="black-text" >
               Submit
             </button>
         </form>
@@ -175,15 +178,15 @@
   {{!-- <div class="one"> --}}
     <div class = "box">
         <form>
-            <label class="black-text box-titles">Calculate Potential Expense</label>
+            <label class="black-text box-titles dark:text-ES">Calculate Potential Expense</label>
             <br>
             <label class="black-text" for="expense-amount">Expense Total:</label>
-            <input class= "border-2 border-gray-350" type="number" name="expense-amount" id="expense-amount"/><br/>
+            <input class= "border-2 border-gray-350 dark:text-black" type="number" name="expense-amount" id="expense-amount"/><br/>
             <label class="black-text" for="share-amount">Percent that you pay of the expense:</label>
-            <input class= "border-2 border-gray-350" type="number" name="share-amount" id="share-amount" /><br/>
+            <input class= "border-2 border-gray-350 dark:text-black" type="number" name="share-amount" id="share-amount" /><br/>
         </form>
 
-        <button class= "btn btn-primary" id="calculate_button" type="submit"  onclick="automatic_calc()">
+        <button class= "btn btn-primary dark:bg-ES dark:text-black" id="calculate_button" type="submit"  onclick="automatic_calc()">
             Calculate
         </button>
         <div id="calculate_button_result">
@@ -212,12 +215,12 @@
 {{!-- </section> --}}
   {{!-- </div> --}}
 
-
-<br> <br> <br>
-
+<p style="padding-bottom:200px">&nbsp;</p>
 
 {{!-- {{> home/expenses transactions=transactions}} --}}
 
+<p style="padding-bottom:15px">&nbsp;</p>
+</div>
 </html>
 
 

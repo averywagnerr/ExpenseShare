@@ -48,6 +48,20 @@ CREATE TABLE IF NOT EXISTS user_to_reciept_transactions (
 	username VARCHAR(50) REFERENCES users(username),
 	transaction_id INT REFERENCES reciept_transactions,
 	PRIMARY KEY (username, transaction_id)
+);
+
+CREATE TABLE IF NOT EXISTS deposit_withdrawl (
+  id SERIAL PRIMARY KEY,
+  sender VARCHAR(50) REFERENCES users(username),
+  deposit DECIMAL(10, 2) NOT NULL,
+  withdrawl DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_to_deposit_withdrawl (
+	username VARCHAR(50) REFERENCES users(username),
+	deposit_id INT REFERENCES deposit_withdrawl,
+	PRIMARY KEY (username, deposit_id)
 )
 
 --TODO: Potentially add views to simplify queries

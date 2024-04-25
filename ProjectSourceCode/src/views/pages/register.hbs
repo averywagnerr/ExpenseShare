@@ -1,3 +1,4 @@
+<div class = "dark:bg-gray-500">
 {{> message}}
 
 <style>
@@ -35,7 +36,7 @@
     }
 </style>
 
-<h1 class = "text-4xl">Register a new account:</h1>
+<h1 class = "text-4xl dark:text-ES">Register a new account:</h1>
 <div class="grid">
     <form method="post" action="/register">
         <p>&nbsp;</p>
@@ -49,13 +50,14 @@
         {{!-- <input type="text" name="password"/><br /> --}}
         <input class= "border-2 border-gray-350" type="password" id="password" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required><br />
         <p>&nbsp;</p>
-        <button class= "btn btn-primary" id="submit_button" type="submit">
+        <button class= "btn btn-primary dark:bg-ES dark:text-black" id="submit_button" type="submit">
             Register
         </button>
         <p>&nbsp;</p>
     </form>
 
-    <p class="secondRow">Already have an account? Login Here: <a class="underline" href="./login">Login</a></p>
+    <p class="secondRow">Already have an account? Login Here: <a class="underline dark:text-ES" href="./login">Login</a></p>
 </div>
 
-<p style="padding-bottom:50px">&nbsp;</p>
+<p style="padding-bottom:250px">&nbsp;</p>
+</div>

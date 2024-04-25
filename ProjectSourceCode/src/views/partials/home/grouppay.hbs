@@ -1,31 +1,14 @@
-<div class = "box">
-	<label class="black-text box-titles">Group Pay</label>
-	<br>
-    <form class="" method="POST" action="/groupexpense" >
-		<div class="row">
-			<label class="black-text col-form-label" for="expense-amount">Expense</label>
-			<div class="col-sm-10 input-group mb-3" id="expense-amount">
-				<span class="input-group-text">$</span>
-				<input type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
-			</div>
-		</div>
-		{{!-- <div class="col-sm-10"> --}}
-			{{!-- <label class="black-text" for="groupname">Group Name:</label> --}}
-			<div class=" input-group mb-3" id="groupname">
-				<span class="input-group-text">Group Name</span>
-				<input type="text" class="form-control" aria-label="Group Name">
-			</div>
-			<div class=" input-group mb-3" id="desc">
-				<span class="input-group-text">Description</span>
-				<input type="text" class="form-control" aria-label="Description">
-			</div>
-
-		{{!-- </div> --}}
-			{{!-- <input class= "border-2 border-gray-350" type="text" name="expenseamount"/><br/> --}}
-			{{!-- <input class= "border-2 border-gray-350" type="text" id="groupname"/><br/>
+<div class = "box dark:bg-gray-600 dark:text-white">
+    <form method="POST" action="/groupexpense" >
+			<label class="black-text box-titles dark:text-ES">Group Pay</label>
+			<br>
+			<label class="black-text  dark:text-black" for="expense-amount">Expense:</label>
+			<input class= "border-2 border-gray-350" type="text" name="expenseamount"/><br/>
+			<label class="black-text  dark:text-black" type="groupname">Groupname:</label>
+			<input class= "border-2 border-gray-350" type="text" name="groupname"/><br/>
 			<label class="black-text" type="groupname">Description:</label>
-			<input class= "border-2 border-gray-350" type="text" name="description"/><br/> --}}
-			<button class= "btn btn-primary" id="calculate_button" type="submit" >
+			<input class= " dark:text-black" type="text" name="description"/><br/> 
+			<button class= "btn btn-primary dark:bg-ES dark:text-black" id="calculate_button" type="submit" >
 				Send Expense	
 			</button>
     </form>
