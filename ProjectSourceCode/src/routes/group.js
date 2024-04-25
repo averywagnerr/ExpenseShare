@@ -1,14 +1,9 @@
 const express = require("express");
-const axios = require("axios");
-// const jwt = require('jsonwebtoken');
 const ShortUniqueId = require("short-unique-id");
 // const { randomUUID } = new ShortUniqueId({ length: 10 });
-const { bcrypt, db, randomUUID } = require("../resources/js/initdata");
+const { bcrypt, db } = require("../resources/js/initdata");
 
-const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const Router = express.Router();
-
-// let Group = require('../models/group');
 
 async function getGroups(req, res) {
   try {
@@ -62,7 +57,7 @@ async function getGroups(req, res) {
 //       });
 
 //       const users = db.manyOrNone(
-//         "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
+// "SELECT * FROM groups g JOIN user_to_groups ug ON g.token = ug.token WHERE ug.groupname = $1",
 //         // req.body.groupname
 //         groupname
 //       )
@@ -141,23 +136,29 @@ Router.post("/createGroup", async (req, res) => {
       // Hash the joincode using bcrypt library
       const hash = await bcrypt.hash(toString(token), 10);
 
-      await t.none("INSERT INTO groups(token, groupname) VALUES ($1, $2);", [
-        hash,
-        req.body.groupname,
-      ]).then((r) => {
-         t.none("INSERT INTO user_to_groups (username, token, groupname) VALUES ($1, $2, $3)",
-        [req.session.user.username, hash, req.body.groupname])
-      });
+      await t
+        .none("INSERT INTO groups(token, groupname) VALUES ($1, $2);", [
+          hash,
+          req.body.groupname,
+        ])
+        .then((r) => {
+          t.none(
+            "INSERT INTO user_to_groups (username, token, groupname) VALUES ($1, $2, $3)",
+            [req.session.user.username, hash, req.body.groupname]
+          );
+        });
 
       const groups = await getGroups(req);
+			req.session.user.groups = groups;
 
-      res
-        .render("pages/home", {
-          message: `Successfully created group!`,
-          user: req.session.user,
-          username: req.session.user.username,
-          groups: groups,
-        });
+
+      res.render("pages/home", {
+        message: `Successfully created group!`,
+        user: req.session.user,
+        username: req.session.user.username,
+        groups: req.session.user.groups,
+        balance: req.session.user.balance,
+      });
 
       // res.send({ message: "Successfully created group!"})
       // Redirect to the home page with a success message
@@ -242,13 +243,14 @@ Router.post("/joinGroup", async (req, res) => {
     // const groups = getGroups(req);
 
     const groups = await getGroups(req, res);
+    req.session.user.groups = groups;
 
-    // res.redirect(302, "/home");
     res.render("pages/home", {
       message: `Succesfully joined ${req.body.groupname}!`,
       user: req.session.user,
       username: req.session.user.username,
-      groups: groups,
+      groups: req.session.user.groups,
+      balance: req.session.user.balance,
     });
   }).catch((err) => {
     console.error(err);

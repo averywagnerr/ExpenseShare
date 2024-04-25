@@ -88,36 +88,10 @@
   </div>
   {{!-- <div class="two"> --}}
   <div class="col">
-    {{> home/expenses transactions=transactions}}
+    {{!-- {{> home/expenses transactions=transactions}} --}}
 
 
-    {{!-- <div class = "box">
-        <label class="black-text box-titles"> Payment History </label>
-
-        <div class="table-responsive">
-          <table class="table table-light">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Deposit Amount</th>
-                <th>Withdraw Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>User 1</td>
-                <td>+ $100</td>
-                <td>- $100</td>
-              </tr>
-               <tr>
-                <td>User 2</td>
-                <td>+ $200</td>
-                <td>- $200</td>
-              </tr>
-              
-            </tbody>
-            </table>
-        </div> --}}
+    {{> home/payment deposit_withdrawl=deposit_withdrawl}}
   </div>
   
 
@@ -130,9 +104,6 @@
     </div>
   </div>
 {{!-- </section> --}}
-
-
-
 
 
 
@@ -172,13 +143,13 @@
         <form>
             <label class="black-text box-titles dark:text-ES">Calculate Potential Expense</label>
             <br>
-            <div class=" input-group mb-3 dark:text-black" id="expense-amount">
+            <div class=" input-group mb-3 dark:text-black" >
               <span class="input-group-text">Expense Total:</span>
-              <input type="number " class="form-control border-2 border-gray-350 dark:text-black" aria-label="Expense Total">
+              <input type="number" class="form-control border-2 border-gray-350 dark:text-black" aria-label="Expense Total" id="expense-amount">
 			      </div>
-            <div class=" input-group mb-3 dark:text-black" id="share-amount">
+            <div class=" input-group mb-3 dark:text-black" >
               <span class="input-group-text">Percent You Pay:</span>
-              <input type="number " class="form-control border-2 border-gray-350 dark:text-black" aria-label="Your percentage">
+              <input type="number" class="form-control border-2 border-gray-350 dark:text-black" aria-label="Your percentage" id="share-amount">
 			      </div>
             
         </form>
@@ -214,8 +185,10 @@
 
 <p style="padding-bottom:200px">&nbsp;</p>
 
-{{!-- {{> home/expenses transactions=transactions}} --}}
-</body>
+{{> home/expenses transactions=transactions}}
+
+<p style="padding-bottom:15px">&nbsp;</p>
+</div>
 </html>
 
 
