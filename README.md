@@ -13,7 +13,6 @@ An app designed for financiers to manage group expenses.
   <a href="#rocket-deployment">Deployment</a>
 </p>
 
-> :construction: WIP
 
 <br>
 
