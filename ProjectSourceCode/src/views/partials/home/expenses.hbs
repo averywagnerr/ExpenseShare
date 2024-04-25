@@ -1,17 +1,17 @@
  <div class = "box  dark:bg-gray-600 dark:text-white">
-        <label class="black-text box-titles dark:text-ES"> Expense History </label>
+    <label class="black-text box-titles dark:text-ES"> Expense History </label>
 
-        <div class="table-responsive">
-          <table class="table table-light dark:table-dark">
-            <thead>
-              <tr>
-                <th>Amount</th>
-				<th>To/From</th>
-				<th>Description</th>
-				<th>Date</th>
-              </tr>
-            </thead>
-            	<tbody>
+    <div class="table-responsive">
+      <table class="table table-light dark:table-dark">
+        <thead>
+          <tr>
+            <th>Amount</th>
+						<th>To/From</th>
+						<th>Description</th>
+						<th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
 					{{#each transactions}}
 					<tr class="p-6 border-black border-b py-8">
 						{{#if (isEqual ../username receiver)}}
@@ -26,8 +26,8 @@
 					</tr>
 					{{/each}}
 				</tbody>
-            </table>
-        </div>
+    </table>
+</div>
 
 {{!-- <div class = "box w-full mx-auto px-4 dark:bg-gray-600 dark:text-white">
   <h2 class="box-titles dark:text-ES">Expenses</h2>

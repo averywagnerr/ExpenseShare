@@ -10,9 +10,14 @@
 				<input type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" name="expenseamount">
 			</div>
 			</div>
-			<div class=" input-group mb-3 dark:text-black" >
+			<div class="input-group mb-3 dark:text-black">
 				<span class="input-group-text">Group Name</span>
-				<input type="text" class="form-control" aria-label="Group Name" name="groupname">
+				<select class="form-select" aria-label="Group Name" name="groupname">
+					<option value="" selected>Select a group</option>
+					{{#each groups}}
+					<option value="{{groupname}}">{{groupname}}</option>
+					{{/each}}
+				</select>
 			</div>
 			<div class=" input-group mb-3 dark:text-black" id="desc">
 				<span class="input-group-text">Description</span>
