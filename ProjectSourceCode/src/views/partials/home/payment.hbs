@@ -1,0 +1,22 @@
+<div class = "box">
+  <h2 class="black-text box-titles">Deposit and withdrawl history:</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Deposit</th>
+      <th>Withdrawl</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each deposit_withdrawl}}
+    <tr>
+      <td>{{ id }}</td>
+      <td>{{ deposit }}</td>
+      <td>{{ withdrawl }}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+  </table>
+</div>

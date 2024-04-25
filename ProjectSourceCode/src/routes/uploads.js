@@ -116,9 +116,16 @@ Router.post("/upload", uploadStorage.single("file"), (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("pages/home", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -127,6 +134,7 @@ Router.post("/upload", uploadStorage.single("file"), (req, res) => {
         });
       });
     });
+  });
 
   return;
 });

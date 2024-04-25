@@ -35,9 +35,16 @@ Router.get("/joinGroup", (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/joinGroup", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -47,6 +54,7 @@ Router.get("/joinGroup", (req, res) => {
         });
       });
     });
+  });
 });
 
 Router.get("/createGroup", (req, res) => {
@@ -74,9 +82,16 @@ Router.get("/createGroup", (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -86,6 +101,7 @@ Router.get("/createGroup", (req, res) => {
         });
       });
     });
+  });
 });
 
 // * ================ Create Group ================ * //
@@ -117,15 +133,23 @@ Router.post("/createGroup", async (req, res) => {
               req.session.user.id
             )
             .then((transactions) => {
+              const deposit_withdrawl = db
+              .manyOrNone(
+              "SELECT * FROM deposit_withdrawl",
+              req.session.user.id
+              )
+              .then((deposit_withdrawl) => {
               res.render("../views/pages/joinGroup", {
                 user: req.session.user,
                 username: req.session.user.username,
+                deposit_withdrawl: deposit_withdrawl,
                 reciept_transactions: reciept_transactions,
                 transactions: transactions,
                 message: "Group already exists",
                 balance: req.session.user.balance,
               });
             });
+          });
         });
         return;
       }
@@ -164,9 +188,16 @@ Router.post("/createGroup", async (req, res) => {
             req.session.user.id
           )
           .then((transactions) => {
+            const deposit_withdrawl = db
+            .manyOrNone(
+            "SELECT * FROM deposit_withdrawl",
+            req.session.user.id
+            )
+            .then((deposit_withdrawl) => {
             res.render("../views/pages/home", {
               user: req.session.user,
               groups: groups,
+              deposit_withdrawl: deposit_withdrawl,
               username: req.session.user.username,
               reciept_transactions: reciept_transactions,
               transactions: transactions,
@@ -176,6 +207,7 @@ Router.post("/createGroup", async (req, res) => {
           });
         });
       });
+    });
     });
   } catch (e) {
     console.error(e);
@@ -201,9 +233,16 @@ Router.post("/createGroup", async (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -213,6 +252,7 @@ Router.post("/createGroup", async (req, res) => {
         });
       });
     });
+  });
   }
 });
 
@@ -247,9 +287,16 @@ Router.get("/joinGroup", (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/joinGroup", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -260,6 +307,7 @@ Router.get("/joinGroup", (req, res) => {
         });
       });
     });
+  });
 });
 
 Router.post("/joinGroup", async (req, res) => {
@@ -301,9 +349,16 @@ Router.post("/joinGroup", async (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/createGroup", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -312,6 +367,7 @@ Router.post("/joinGroup", async (req, res) => {
           });
         });
       });
+    });
     });
       return;
     }
@@ -342,16 +398,24 @@ Router.post("/joinGroup", async (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             message: "Successfully joined group!",
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             balance: req.session.user.balance,
           });
         });
+      });
       });
     });
     // let groups = [req.session.user.groups];
@@ -385,9 +449,16 @@ Router.post("/joinGroup", async (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             user: req.session.user,
             groups: groups,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
@@ -395,6 +466,7 @@ Router.post("/joinGroup", async (req, res) => {
             balance: req.session.user.balance,
           });
         });
+      });
       });
     });
     // res.redirect("/login?error=" + encodeURIComponent(err.message));
@@ -440,16 +512,24 @@ Router.post("/members", async (req, res) => {
           req.session.user.id
         )
         .then((transactions) => {
+          const deposit_withdrawl = db
+          .manyOrNone(
+          "SELECT * FROM deposit_withdrawl",
+          req.session.user.id
+          )
+          .then((deposit_withdrawl) => {
           res.render("../views/pages/home", {
             user: req.session.user,
             groups: groups,
             members: members,
+            deposit_withdrawl: deposit_withdrawl,
             username: req.session.user.username,
             reciept_transactions: reciept_transactions,
             transactions: transactions,
             balance: req.session.user.balance,
           });
         });
+      });
       });
     });
     });
