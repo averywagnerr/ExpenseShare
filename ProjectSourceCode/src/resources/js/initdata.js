@@ -87,13 +87,14 @@ async function insertGroups(groups) {
 	var successes = 0;
 	for (let i = 0; i < groups.length; i++) {
 		// const groupname = groups[i];
-		const token = groups[i][0];
-		const groupname = groups[i][1];
+		// const token = groups[i][0];
+		const groupname = groups[i][0];
 
 		try {
-			const hash = await bcrypt.hash(token, 10);
+			// const hash = await bcrypt.hash(token, 10);
 
-			await db.none('INSERT INTO groups (token, groupname) VALUES ($1, $2)', [hash, groupname]);
+			await db.none('INSERT INTO groups (groupname) VALUES ($1)', [groupname]);
+			// await db.none('INSERT INTO groups (token, groupname) VALUES ($1, $2)', [hash, groupname]);
 			// await db.none('INSERT INTO groups (groupname) VALUES ($1)', [groupname]);
 			successes++;
 		} catch (error) {
@@ -126,20 +127,20 @@ async function insertGroupMemberships(groupmemberships) {
 	for (let i = 0; i < groupmemberships.length; i++) {
 		const username = groupmemberships[i][0];
 		const groupname = groupmemberships[i][1];
-		const token = groupmemberships[i][2];
+		// const token = groupmemberships[i][2];
 
 		try {
-			const group = await db.oneOrNone(
+			await db.oneOrNone(
 				`SELECT * FROM groups WHERE groups.groupname = $1`,
 				groupname
 			);
 
-			const match = await bcrypt.compare(token, group.token);
-			if (!match) {
-				throw new Error(`Tokens do not match.`);
-			};
+			// const match = await bcrypt.compare(token, group.token);
+			// if (!match) {
+			// 	throw new Error(`Tokens do not match.`);
+			// };
 
-			await db.none('INSERT INTO user_to_groups (username, groupname, token) VALUES ($1, $2, $3)', [username, groupname, group.token]);
+			await db.none('INSERT INTO user_to_groups (username, groupname) VALUES ($1, $2)', [username, groupname]);
 
 			successes++;
 		} catch (error) {
